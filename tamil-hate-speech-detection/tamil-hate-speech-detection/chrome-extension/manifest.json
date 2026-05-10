@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Tamil Hate Speech Detector",
+  "version": "1.0",
+  "description": "Detects Tamil hate speech in YouTube comments and video audio. Research by Anutthara S.A.D | IT22217554 | SLIIT",
+  "permissions": ["activeTab", "storage", "scripting"],
+  "host_permissions": [
+    "http://localhost:5000/*",
+    "*://*.youtube.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Tamil Hate Speech Detector"
+  }
+}
