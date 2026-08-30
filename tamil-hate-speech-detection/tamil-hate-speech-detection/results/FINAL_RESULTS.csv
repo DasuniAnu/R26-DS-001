@@ -1,0 +1,8 @@
+Model,Modality,Accuracy,F1
+M1 TF-IDF+LR,Text,79.94,0.8072
+M2 LSTM,Text,80.81,0.8034
+M3 mBERT,Text,83.65,0.8335
+M4 XLM-RoBERTa,Text,83.18,0.8343
+A1 SVM,Audio,85.86,0.8573
+A2 Dense NN,Audio,83.79,0.8372
+F2 Late Fusion,Multimodal,96.24,0.9622
