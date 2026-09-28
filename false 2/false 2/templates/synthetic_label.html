@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Synthetic Consistency Review</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <main class="app-shell synthetic-page">
+      <section class="workspace" aria-labelledby="page-title">
+        <header class="topbar">
+          <div class="brand">
+            <img src="{{ url_for('static', filename='mark.svg') }}" alt="" class="brand-mark">
+            <div>
+              <h1 id="page-title">Synthetic Consistency Review</h1>
+              <p>Label whether the transcript supports the title and description.</p>
+            </div>
+          </div>
+          <div class="status-pills">
+            <span class="pill" id="saved-count-pill">0 saved</span>
+            <span class="pill" id="new-count-pill">0 synthetic new</span>
+            <span class="pill" id="current-topic-pill">All topics</span>
+          </div>
+        </header>
+
+        <section class="synthetic-toolbar">
+          <label>
+            <span>Topic</span>
+            <select id="topic-filter">
+              <option value="">All topics</option>
+              {% for topic in topics %}
+              <option value="{{ topic }}">{{ topic }}</option>
+              {% endfor %}
+            </select>
+          </label>
+          <label>
+            <span>Current Band</span>
+            <input id="similarity-band" value="No row loaded" readonly>
+          </label>
+          <div class="tester-actions synthetic-toolbar-actions">
+            <button type="button" id="next-button">Next Synthetic</button>
+            <button type="button" class="secondary-button" id="skip-button" disabled>Skip</button>
+            <button type="button" class="secondary-button" id="duplicate-button" disabled>Duplicate</button>
+          </div>
+        </section>
+
+        <div class="synthetic-review-layout">
+          <section class="prediction-form synthetic-review-main">
+            <div class="message compact-message" id="status-panel">
+              <span class="message-label">Status</span>
+              <p>Load a synthetic row to start reviewing.</p>
+            </div>
+
+            <section class="synthetic-text-grid" aria-label="Synthetic text to review">
+              <article class="synthetic-text-panel">
+                <span class="message-label">Title</span>
+                <p id="title-text">No row loaded.</p>
+              </article>
+              <article class="synthetic-text-panel">
+                <span class="message-label">Description</span>
+                <p id="description-text">No row loaded.</p>
+              </article>
+              <article class="synthetic-text-panel transcript-panel">
+                <span class="message-label">Transcript</span>
+                <p id="transcript-text">No row loaded.</p>
+              </article>
+            </section>
+          </section>
+
+          <aside class="labeling-sidebar">
+            <section class="result-panel decision-panel synthetic-decision-panel">
+              <div class="decision-head">
+                <span class="message-label">Human Decision</span>
+                <strong id="decision-summary">Needs review</strong>
+              </div>
+
+              <div class="similarity-grid" aria-label="Pairwise similarity scores">
+                <div class="similarity-card">
+                  <span>Title - Transcript</span>
+                  <strong id="title-transcript-score">0%</strong>
+                  <div class="dataset-meter-bar"><span id="title-transcript-meter"></span></div>
+                </div>
+                <div class="similarity-card">
+                  <span>Description - Transcript</span>
+                  <strong id="description-transcript-score">0%</strong>
+                  <div class="dataset-meter-bar"><span id="description-transcript-meter"></span></div>
+                </div>
+                <div class="similarity-card">
+                  <span>Title - Description</span>
+                  <strong id="title-description-score">0%</strong>
+                  <div class="dataset-meter-bar"><span id="title-description-meter"></span></div>
+                </div>
+              </div>
+
+              <fieldset>
+                <legend>Label</legend>
+                <div class="label-decision-grid">
+                  <label>
+                    <input type="radio" name="binary_label" value="False" checked>
+                    <span>
+                      <strong>Mismatch</strong>
+                      <small>Metadata is not supported</small>
+                    </span>
+                  </label>
+                  <label>
+                    <input type="radio" name="binary_label" value="Not False">
+                    <span>
+                      <strong>Consistent</strong>
+                      <small>Aligned enough</small>
+                    </span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <label>
+                <span>Mismatch Type</span>
+                <select id="mismatch-type">
+                  <option value="title_transcript_mismatch">Title vs transcript mismatch</option>
+                  <option value="description_transcript_mismatch">Description vs transcript mismatch</option>
+                  <option value="clickbait_overclaim">Clickbait or overclaim</option>
+                  <option value="same_topic_swap">Same-topic mismatch</option>
+                  <option value="weak_support">Weak support</option>
+                  <option value="consistent">Consistent</option>
+                </select>
+              </label>
+
+              <label>
+                <span>Confidence</span>
+                <select id="label-confidence">
+                  <option value="high">High</option>
+                  <option value="medium" selected>Medium</option>
+                  <option value="low">Low</option>
+                </select>
+              </label>
+
+              <div class="message compact-message" id="save-check">
+                <span class="message-label">Save Check</span>
+                <p>Load a row and choose a label.</p>
+              </div>
+
+              <div class="tester-actions">
+                <button type="button" id="save-button" disabled>Save Review</button>
+                <button type="button" class="secondary-button" id="clear-button">Clear</button>
+              </div>
+            </section>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const topicFilter = document.getElementById("topic-filter");
+      const similarityBandInput = document.getElementById("similarity-band");
+      const nextButton = document.getElementById("next-button");
+      const skipButton = document.getElementById("skip-button");
+      const duplicateButton = document.getElementById("duplicate-button");
+      const saveButton = document.getElementById("save-button");
+      const clearButton = document.getElementById("clear-button");
+      const statusPanel = document.getElementById("status-panel");
+      const saveCheck = document.getElementById("save-check");
+      const savedCountPill = document.getElementById("saved-count-pill");
+      const newCountPill = document.getElementById("new-count-pill");
+      const currentTopicPill = document.getElementById("current-topic-pill");
+      const titleText = document.getElementById("title-text");
+      const descriptionText = document.getElementById("description-text");
+      const transcriptText = document.getElementById("transcript-text");
+      const decisionSummary = document.getElementById("decision-summary");
+      const mismatchTypeInput = document.getElementById("mismatch-type");
+      const labelConfidenceInput = document.getElementById("label-confidence");
+      const titleTranscriptScore = document.getElementById("title-transcript-score");
+      const descriptionTranscriptScore = document.getElementById("description-transcript-score");
+      const titleDescriptionScore = document.getElementById("title-description-score");
+      const titleTranscriptMeter = document.getElementById("title-transcript-meter");
+      const descriptionTranscriptMeter = document.getElementById("description-transcript-meter");
+      const titleDescriptionMeter = document.getElementById("title-description-meter");
+
+      let currentCandidate = null;
+
+      function percent(value) {
+        return `${(Number(value || 0) * 100).toFixed(1)}%`;
+      }
+
+      function setMessage(panel, message, isError = false) {
+        panel.className = panel.classList.contains("compact-message")
+          ? `message compact-message${isError ? " error" : ""}`
+          : `message${isError ? " error" : ""}`;
+        panel.querySelector("p").textContent = message;
+      }
+
+      function selectedBinaryLabel() {
+        const checked = document.querySelector("input[name='binary_label']:checked");
+        return checked ? checked.value : "False";
+      }
+
+      function setBinaryLabel(value) {
+        const input = document.querySelector(`input[name='binary_label'][value="${value}"]`);
+        if (input) input.checked = true;
+        mismatchTypeInput.value = value === "Not False" ? "consistent" : "title_transcript_mismatch";
+        updateDecisionSummary();
+        updateSaveReadiness();
+      }
+
+      function updateDecisionSummary() {
+        decisionSummary.textContent = selectedBinaryLabel() === "False"
+          ? `Mismatch: ${mismatchTypeInput.options[mismatchTypeInput.selectedIndex].textContent}`
+          : "Consistent";
+      }
+
+      function updateSaveReadiness() {
+        const missing = [];
+        if (!currentCandidate) missing.push("synthetic row");
+        if (selectedBinaryLabel() === "False" && mismatchTypeInput.value === "consistent") missing.push("mismatch type");
+        saveButton.disabled = missing.length > 0;
+        setMessage(
+          saveCheck,
+          missing.length ? `Missing before save: ${missing.join(", ")}.` : "Ready to save this human review.",
+          missing.length > 0
+        );
+        return missing.length === 0;
+      }
+
+      function automaticRationale(label, mismatchType) {
+        if (label === "Not False") {
+          return "Human review: title, description, and transcript are aligned enough.";
+        }
+        const mismatchText = mismatchTypeInput.options[mismatchTypeInput.selectedIndex].textContent;
+        return `Human review: ${mismatchText}; metadata is not sufficiently supported by the transcript.`;
+      }
+
+      function updateSummary(data) {
+        const quality = data.quality || data;
+        const labels = quality.label_counts || {};
+        const pool = quality.synthetic_pool_status_counts || data.synthetic_pool_status_counts || {};
+        savedCountPill.textContent = `${quality.row_count || 0} saved`;
+        newCountPill.textContent = `${pool.new || 0} synthetic new`;
+        currentTopicPill.textContent = topicFilter.value || "All topics";
+        if (labels.False || labels["Not False"]) {
+          savedCountPill.textContent = `${labels.False || 0} mismatch / ${labels["Not False"] || 0} consistent`;
+        }
+      }
+
+      function setSimilarity(candidate) {
+        const pairs = [
+          [titleTranscriptScore, titleTranscriptMeter, candidate.title_transcript_similarity],
+          [descriptionTranscriptScore, descriptionTranscriptMeter, candidate.description_transcript_similarity],
+          [titleDescriptionScore, titleDescriptionMeter, candidate.title_description_similarity]
+        ];
+        pairs.forEach(([score, meter, value]) => {
+          score.textContent = percent(value);
+          meter.style.width = percent(value);
+        });
+      }
+
+      function renderCandidate(candidate) {
+        currentCandidate = candidate;
+        titleText.textContent = candidate.title || "";
+        descriptionText.textContent = candidate.description || "";
+        transcriptText.textContent = candidate.transcript || "";
+        similarityBandInput.value = candidate.similarity_band || "Unspecified";
+        setBinaryLabel("False");
+        setSimilarity(candidate);
+        skipButton.disabled = false;
+        duplicateButton.disabled = false;
+        setMessage(statusPanel, `Reviewing ${candidate.video_id} in ${candidate.topic}.`);
+        updateSaveReadiness();
+      }
+
+      async function loadNextCandidate() {
+        nextButton.disabled = true;
+        nextButton.textContent = "Loading...";
+        setMessage(statusPanel, "Loading next synthetic row...");
+        try {
+          const topic = topicFilter.value ? `?topic=${encodeURIComponent(topicFilter.value)}` : "";
+          const response = await fetch(`/api/synthetic-labeling/next${topic}`);
+          const data = await response.json();
+          if (!response.ok) {
+            setMessage(statusPanel, data.error || "Could not load synthetic row.", true);
+            return;
+          }
+          updateSummary(data);
+          if (!data.candidate) {
+            currentCandidate = null;
+            setMessage(statusPanel, data.message || "No synthetic rows available.", true);
+            updateSaveReadiness();
+            return;
+          }
+          renderCandidate(data.candidate);
+        } catch (error) {
+          setMessage(statusPanel, error.message, true);
+        } finally {
+          nextButton.disabled = false;
+          nextButton.textContent = "Next Synthetic";
+        }
+      }
+
+      async function updateCandidateStatus(status) {
+        if (!currentCandidate) {
+          setMessage(statusPanel, "Load a synthetic row first.", true);
+          return;
+        }
+        try {
+          const response = await fetch("/api/synthetic-labeling/status", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ video_id: currentCandidate.video_id, status })
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            setMessage(statusPanel, data.error || "Could not update row status.", true);
+            return;
+          }
+          updateSummary(data);
+          setMessage(statusPanel, `Marked ${currentCandidate.video_id} as ${status}.`);
+          clearCandidate();
+        } catch (error) {
+          setMessage(statusPanel, error.message, true);
+        }
+      }
+
+      async function refreshSummary() {
+        const response = await fetch("/api/dataset-quality");
+        const data = await response.json();
+        updateSummary(data);
+      }
+
+      async function saveReview() {
+        if (!updateSaveReadiness()) return;
+        const label = selectedBinaryLabel();
+        const consistencyLabel = label === "False" ? "Inconsistent" : "Consistent";
+        const mismatchType = label === "False" ? mismatchTypeInput.value : "consistent";
+        const rationale = automaticRationale(label, mismatchType);
+        saveButton.disabled = true;
+        saveButton.textContent = "Saving...";
+        try {
+          const response = await fetch("/api/labels", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              video_id: currentCandidate.video_id,
+              url: currentCandidate.url,
+              title: currentCandidate.title,
+              description: currentCandidate.description,
+              transcript: currentCandidate.transcript,
+              topic: currentCandidate.topic,
+              original_label: label === "False" ? "Misleading" : "Reliable",
+              binary_label: label,
+              consistency_label: consistencyLabel,
+              mismatch_type: mismatchType,
+              support_rationale: rationale,
+              label_source: "Human-reviewed synthetic consistency annotation",
+              annotator_notes: rationale,
+              group_id: currentCandidate.suggested_group_id || `synthetic-${currentCandidate.video_id}`,
+              label_confidence: labelConfidenceInput.value,
+              queue_source: "synthetic_labeling_pool",
+              caption_source: "synthetic_transcript",
+              generated_negative: label === "False" ? "true" : "false",
+              source_title_video_id: currentCandidate.source_title_video_id || currentCandidate.video_id,
+              source_transcript_video_id: currentCandidate.source_transcript_video_id || currentCandidate.video_id
+            })
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            setMessage(statusPanel, data.error || "Could not save review.", true);
+            return;
+          }
+          updateSummary(data.summary || {});
+          setMessage(statusPanel, `Saved review for ${currentCandidate.video_id}.`);
+          clearCandidate();
+          await refreshSummary();
+        } catch (error) {
+          setMessage(statusPanel, error.message, true);
+        } finally {
+          saveButton.disabled = false;
+          saveButton.textContent = "Save Review";
+          updateSaveReadiness();
+        }
+      }
+
+      function clearCandidate() {
+        currentCandidate = null;
+        titleText.textContent = "No row loaded.";
+        descriptionText.textContent = "No row loaded.";
+        transcriptText.textContent = "No row loaded.";
+        similarityBandInput.value = "No row loaded";
+        setSimilarity({});
+        skipButton.disabled = true;
+        duplicateButton.disabled = true;
+        updateDecisionSummary();
+        updateSaveReadiness();
+      }
+
+      nextButton.addEventListener("click", loadNextCandidate);
+      skipButton.addEventListener("click", () => updateCandidateStatus("skipped"));
+      duplicateButton.addEventListener("click", () => updateCandidateStatus("duplicate"));
+      saveButton.addEventListener("click", saveReview);
+      clearButton.addEventListener("click", clearCandidate);
+      mismatchTypeInput.addEventListener("change", () => {
+        if (mismatchTypeInput.value === "consistent") {
+          setBinaryLabel("Not False");
+        } else {
+          document.querySelector("input[name='binary_label'][value='False']").checked = true;
+        }
+        updateDecisionSummary();
+        updateSaveReadiness();
+      });
+      document.querySelectorAll("input[name='binary_label']").forEach((input) => {
+        input.addEventListener("change", () => setBinaryLabel(input.value));
+      });
+      topicFilter.addEventListener("change", () => {
+        currentTopicPill.textContent = topicFilter.value || "All topics";
+      });
+
+      setBinaryLabel("False");
+      refreshSummary();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Sinhala Detector</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main>
+      <h1>Sinhala Detector</h1>
+      <p id="status">Open a YouTube video and check whether it is False or Not False.</p>
+      <button id="check">Check Video</button>
+
+      <section id="result" hidden>
+        <div class="label" id="label"></div>
+        <div class="confidence" id="confidence"></div>
+        <div class="meta" id="fields"></div>
+        <div class="meta" id="review"></div>
+        <div class="meta" id="evidence"></div>
+        <ul id="probabilities"></ul>
+        <div class="warning" id="warnings"></div>
+      </section>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

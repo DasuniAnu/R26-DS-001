@@ -1,0 +1,19 @@
+# Shared lightweight environment for the NEW integration layer only:
+# the gateway (reverse-proxy) and the frontend shell (unified Streamlit UI).
+#
+# The Tamil and Sinhala backends are NOT installed here — they keep running
+# from their own existing, already-proven venvs, completely unchanged:
+#   - tamil-hate-speech-detection.../venv
+#   - AT final/.venv  (backend)
+#   - AT final/frontend/venv
+#
+# Versions below match what is already installed and working in those venvs
+# (verified via pip freeze), so the shell can call into both backends'
+# report-building code (which imports pandas/reportlab) without any
+# version mismatch.
+
+flask==3.1.3
+requests==2.33.1
+streamlit==1.57.0
+pandas==3.0.2
+reportlab==5.0.0

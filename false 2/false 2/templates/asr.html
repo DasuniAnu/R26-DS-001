@@ -1,0 +1,861 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ASR Dataset - Sinhala Whisper</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace" aria-labelledby="page-title">
+        <header class="topbar">
+          <div class="brand">
+            <img src="{{ url_for('static', filename='mark.svg') }}" alt="" class="brand-mark">
+            <div>
+              <h1 id="page-title">Sinhala ASR Dataset</h1>
+              <p>Curate YouTube audio and human reference transcripts for Whisper evaluation.</p>
+            </div>
+          </div>
+          <div class="status-pills">
+            <span class="pill {{ 'ready' if youtube_api_key_loaded else 'missing' }}">YouTube API</span>
+            <span class="pill {{ 'ready' if audio_transcript.whisper_backend else 'missing' }}">Whisper</span>
+            <span class="pill {{ 'ready' if audio_transcript.yt_dlp else 'missing' }}">yt-dlp</span>
+            <span class="pill {{ 'ready' if audio_transcript.ffmpeg else 'missing' }}">FFmpeg</span>
+          </div>
+        </header>
+
+        <nav class="workflow-steps" aria-label="ASR workflow">
+          <span class="workflow-step active" id="step-load">Load</span>
+          <span class="workflow-step" id="step-transcribe">Transcribe</span>
+          <span class="workflow-step" id="step-review">Review</span>
+          <span class="workflow-step" id="step-save">Save</span>
+        </nav>
+
+        <div class="content-grid tester-grid">
+          <form class="prediction-form tester-form" id="asr-form">
+            <section class="flow-step section-block">
+              <span class="step-label">YouTube Source</span>
+              <div class="label-grid">
+                <label>
+                  <span>Auto Topic</span>
+                  <select id="auto-topic">
+                    {% for topic in topics %}
+                    <option value="{{ topic }}">{{ topic }}</option>
+                    {% endfor %}
+                  </select>
+                </label>
+                <label>
+                  <span>Results</span>
+                  <select id="auto-limit">
+                    <option value="10">10 videos</option>
+                    <option value="25">25 videos</option>
+                    <option value="50">50 videos</option>
+                  </select>
+                </label>
+              </div>
+              <label>
+                <span>Auto Search Query</span>
+                <input id="auto-query" autocomplete="off">
+              </label>
+              <div class="tester-actions">
+                <button type="button" id="auto-url-button">Auto Generate URL</button>
+                <button type="button" class="secondary-button" id="next-url-button" disabled>Next URL</button>
+                <button type="button" class="secondary-button" id="queue-button" disabled>Start Review Queue</button>
+                <button type="button" class="secondary-button" id="clear-queue-button" disabled>Clear Queue</button>
+              </div>
+              <div class="url-row">
+                <label class="grow-field">
+                  <span>YouTube URL</span>
+                  <input id="youtube-url" name="url" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off">
+                </label>
+                <button type="button" id="load-button">Load</button>
+              </div>
+              <div class="message {{ '' if youtube_api_key_loaded else 'error' }}" id="source-status">
+                <span class="message-label">Source</span>
+                <p>{{ 'Ready.' if youtube_api_key_loaded else 'YOUTUBE_API_KEY is missing.' }}</p>
+              </div>
+              <div class="candidate-list" id="candidate-list"></div>
+            </section>
+
+            <section class="thumbnail-review section-block">
+              <span class="step-label">Video Context</span>
+              <div class="thumbnail-review-grid">
+                <label>
+                  <span>Title</span>
+                  <input id="title" name="title" autocomplete="off">
+                </label>
+                <div class="thumbnail-preview" id="thumbnail-preview">
+                  <span>No thumbnail loaded</span>
+                </div>
+              </div>
+              <label>
+                <span>Description</span>
+                <textarea id="description" name="description" rows="4"></textarea>
+              </label>
+            </section>
+
+            <section class="flow-step section-block">
+              <span class="step-label">Whisper Draft</span>
+              <div class="tester-actions">
+                <button type="button" id="generate-button">Generate Transcript</button>
+                <button type="button" class="secondary-button" id="refresh-button">Regenerate</button>
+                <button type="button" class="secondary-button" id="copy-draft-button">Copy To Reference</button>
+              </div>
+              <div class="label-grid">
+                <label>
+                  <span>Runtime</span>
+                  <input id="runtime" readonly value="{{ audio_transcript.runtime or '' }}">
+                </label>
+                <label>
+                  <span>Model</span>
+                  <input id="model-name" readonly value="{{ audio_transcript.model or '' }}">
+                </label>
+              </div>
+              <label>
+                <span>Whisper Transcript</span>
+                <textarea id="whisper-transcript" rows="7" readonly></textarea>
+              </label>
+              <div class="message" id="whisper-status">
+                <span class="message-label">Whisper</span>
+                <p>{{ 'Ready.' if audio_transcript.whisper_backend else 'Whisper backend unavailable.' }}</p>
+              </div>
+            </section>
+
+            <section class="flow-step section-block">
+              <span class="step-label">Reference Sample</span>
+              <div class="tester-actions">
+                <button type="button" class="secondary-button" id="clean-reference-button">Clean Reference</button>
+              </div>
+              <label>
+                <span>Human Reference Transcript</span>
+                <textarea id="reference-transcript" name="transcript" rows="9"></textarea>
+              </label>
+              <div class="message" id="reference-quality-panel">
+                <span class="message-label">Reference Quality</span>
+                <p id="reference-quality-text">Paste or generate a Sinhala reference transcript.</p>
+              </div>
+              <div class="label-grid">
+                <label>
+                  <span>Split</span>
+                  <select id="split" name="split">
+                    {% for split in splits %}
+                    <option value="{{ split }}" {{ 'selected' if split == 'test' else '' }}>{{ split }}</option>
+                    {% endfor %}
+                  </select>
+                </label>
+                <label>
+                  <span>Source</span>
+                  <input id="source" name="source" value="youtube_whisper" autocomplete="off">
+                </label>
+              </div>
+              <div class="label-grid">
+                <label>
+                  <span>Audio Path</span>
+                  <input id="audio-path" name="audio_path" readonly>
+                </label>
+                <label>
+                  <span>Duration Seconds</span>
+                  <input id="duration-seconds" name="duration_seconds" readonly>
+                </label>
+              </div>
+            </section>
+
+            <div class="tester-actions">
+              <button type="submit" id="save-button">Save ASR Sample</button>
+              <button type="button" class="secondary-button" id="save-next-button" disabled>Save & Next Draft</button>
+              <button type="button" class="secondary-button" id="clear-button">Clear</button>
+            </div>
+          </form>
+
+          <aside class="result-panel tester-result" aria-live="polite">
+            <div class="empty-state compact-empty" id="empty-state">
+              <div class="signal-bars" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <p>Load a video and generate a transcript.</p>
+            </div>
+
+            <div class="message" id="manifest-panel">
+              <span class="message-label">Manifest</span>
+              <p id="manifest-text">Loading manifest summary...</p>
+            </div>
+
+            <div class="dataset-meter">
+              <div class="dataset-meter-bar"><span id="test-meter-fill"></span></div>
+              <p id="test-meter-text">0 of 10 test samples.</p>
+            </div>
+
+            <div class="message" id="queue-panel">
+              <span class="message-label">Review Queue</span>
+              <p id="queue-text">Search videos, select candidates, then start a review queue.</p>
+            </div>
+
+            <div class="message" id="sample-panel" hidden>
+              <span class="message-label">Current Sample</span>
+              <p id="sample-text"></p>
+            </div>
+
+            <div class="message error" id="error-panel" hidden>
+              <span class="message-label">Error</span>
+              <p id="error-text"></p>
+            </div>
+
+            <div class="message" id="warnings-panel" hidden>
+              <span class="message-label">Warnings</span>
+              <p id="warnings-text"></p>
+            </div>
+
+            <div class="api-panel" id="json-panel" hidden>
+              <h2>JSON</h2>
+              <pre id="json-output"></pre>
+            </div>
+            <button type="button" class="secondary-button" id="toggle-json-button">Show JSON</button>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const form = document.getElementById("asr-form");
+      const youtubeUrlInput = document.getElementById("youtube-url");
+      const autoTopicInput = document.getElementById("auto-topic");
+      const autoLimitInput = document.getElementById("auto-limit");
+      const autoQueryInput = document.getElementById("auto-query");
+      const autoUrlButton = document.getElementById("auto-url-button");
+      const nextUrlButton = document.getElementById("next-url-button");
+      const queueButton = document.getElementById("queue-button");
+      const clearQueueButton = document.getElementById("clear-queue-button");
+      const candidateList = document.getElementById("candidate-list");
+      const loadButton = document.getElementById("load-button");
+      const generateButton = document.getElementById("generate-button");
+      const refreshButton = document.getElementById("refresh-button");
+      const copyDraftButton = document.getElementById("copy-draft-button");
+      const cleanReferenceButton = document.getElementById("clean-reference-button");
+      const saveButton = document.getElementById("save-button");
+      const saveNextButton = document.getElementById("save-next-button");
+      const clearButton = document.getElementById("clear-button");
+      const sourceStatus = document.getElementById("source-status");
+      const whisperStatus = document.getElementById("whisper-status");
+      const titleInput = document.getElementById("title");
+      const descriptionInput = document.getElementById("description");
+      const thumbnailPreview = document.getElementById("thumbnail-preview");
+      const whisperTranscriptInput = document.getElementById("whisper-transcript");
+      const referenceTranscriptInput = document.getElementById("reference-transcript");
+      const referenceQualityPanel = document.getElementById("reference-quality-panel");
+      const referenceQualityText = document.getElementById("reference-quality-text");
+      const splitInput = document.getElementById("split");
+      const sourceInput = document.getElementById("source");
+      const audioPathInput = document.getElementById("audio-path");
+      const durationInput = document.getElementById("duration-seconds");
+      const runtimeInput = document.getElementById("runtime");
+      const modelNameInput = document.getElementById("model-name");
+      const emptyState = document.getElementById("empty-state");
+      const manifestText = document.getElementById("manifest-text");
+      const testMeterFill = document.getElementById("test-meter-fill");
+      const testMeterText = document.getElementById("test-meter-text");
+      const queuePanel = document.getElementById("queue-panel");
+      const queueText = document.getElementById("queue-text");
+      const samplePanel = document.getElementById("sample-panel");
+      const sampleText = document.getElementById("sample-text");
+      const errorPanel = document.getElementById("error-panel");
+      const errorText = document.getElementById("error-text");
+      const warningsPanel = document.getElementById("warnings-panel");
+      const warningsText = document.getElementById("warnings-text");
+      const jsonPanel = document.getElementById("json-panel");
+      const jsonOutput = document.getElementById("json-output");
+      const toggleJsonButton = document.getElementById("toggle-json-button");
+      const workflowSteps = {
+        load: document.getElementById("step-load"),
+        transcribe: document.getElementById("step-transcribe"),
+        review: document.getElementById("step-review"),
+        save: document.getElementById("step-save")
+      };
+      const topicSearchQueries = {{ topic_search_queries | tojson }};
+      let currentVideoId = "";
+      let currentThumbnailUrl = "";
+      let latestPayload = null;
+      let latestCandidates = [];
+      let selectedCandidateIds = new Set();
+      let reviewQueue = [];
+      let queueIndex = -1;
+      let queueActive = false;
+      let nextPageToken = "";
+
+      function setWorkflowStep(activeStep) {
+        const order = ["load", "transcribe", "review", "save"];
+        Object.entries(workflowSteps).forEach(([name, element]) => {
+          element.classList.toggle("active", name === activeStep);
+          element.classList.toggle("done", order.indexOf(name) < order.indexOf(activeStep));
+        });
+      }
+
+      function setMessage(panel, message, isError = false) {
+        panel.className = isError ? "message error" : "message";
+        panel.querySelector("p").textContent = message;
+      }
+
+      function startTranscriptProgress(panel) {
+        const steps = [
+          "Downloading YouTube audio...",
+          "Converting audio to 16 kHz WAV...",
+          "Loading Sinhala ASR model...",
+          "Generating Sinhala transcript...",
+          "Finalizing transcript..."
+        ];
+        const startedAt = Date.now();
+        let index = 0;
+        panel.className = "message";
+        panel.querySelector("p").innerHTML = `
+          <span>${steps[0]}</span>
+          <span class="progress-note">
+            <span class="progress-track"><span style="width: 8%"></span></span>
+            <small>Elapsed: 0s. Long videos can take several minutes.</small>
+          </span>
+        `;
+        return window.setInterval(() => {
+          index = Math.min(index + 1, steps.length - 1);
+          const elapsed = Math.max(1, Math.round((Date.now() - startedAt) / 1000));
+          const width = Math.min(92, 8 + elapsed * 4);
+          panel.querySelector("p").innerHTML = `
+            <span>${steps[index]}</span>
+            <span class="progress-note">
+              <span class="progress-track"><span style="width: ${width}%"></span></span>
+              <small>Elapsed: ${elapsed}s. Long videos can take several minutes.</small>
+            </span>
+          `;
+        }, 5000);
+      }
+
+      function stopTranscriptProgress(timer) {
+        if (timer) window.clearInterval(timer);
+      }
+
+      function showPayload(payload) {
+        latestPayload = payload;
+        jsonOutput.textContent = JSON.stringify(payload, null, 2);
+      }
+
+      function showError(message, payload = null) {
+        errorPanel.hidden = false;
+        errorText.textContent = message;
+        if (payload) showPayload(payload);
+      }
+
+      function clearError() {
+        errorPanel.hidden = true;
+        errorText.textContent = "";
+      }
+
+      function escapeHtml(value) {
+        return String(value || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      function setQueueMessage(message, isError = false) {
+        queuePanel.className = isError ? "message error" : "message";
+        queueText.textContent = message;
+      }
+
+      function cleanReferenceTranscript(value) {
+        return String(value || "")
+          .replace(/\b\d{1,2}:\d{2}(?::\d{2})?\b/g, " ")
+          .replace(/\[[^\]]+\]/g, " ")
+          .replace(/\s+/g, " ")
+          .trim();
+      }
+
+      function referenceQuality(value) {
+        const cleaned = cleanReferenceTranscript(value);
+        const sinhalaChars = (cleaned.match(/[\u0d80-\u0dff]/g) || []).length;
+        const latinChars = (cleaned.match(/[A-Za-z]/g) || []).length;
+        const foreignScriptChars = (cleaned.match(/[\u0900-\u097f\u0980-\u09ff\u0b80-\u0bff\u0400-\u04ff]/g) || []).length;
+        const errors = [];
+        if (sinhalaChars < 120) {
+          errors.push("Needs more Sinhala text.");
+        }
+        if (foreignScriptChars > Math.max(20, Math.floor(sinhalaChars / 6))) {
+          errors.push("Too much non-Sinhala script.");
+        }
+        if (latinChars > Math.max(80, Math.floor(sinhalaChars / 3))) {
+          errors.push("Too much English/Latin text.");
+        }
+        return { cleaned, sinhalaChars, latinChars, foreignScriptChars, errors };
+      }
+
+      function updateReferenceQuality() {
+        const quality = referenceQuality(referenceTranscriptInput.value);
+        const changed = quality.cleaned !== referenceTranscriptInput.value.trim();
+        referenceQualityPanel.className = quality.errors.length ? "message error" : "message";
+        if (!referenceTranscriptInput.value.trim()) {
+          referenceQualityText.textContent = "Paste or generate a Sinhala reference transcript.";
+        } else if (quality.errors.length) {
+          referenceQualityText.textContent = `${quality.errors.join(" ")} Sinhala chars: ${quality.sinhalaChars}.`;
+        } else {
+          referenceQualityText.textContent = `Looks clean. Sinhala chars: ${quality.sinhalaChars}${changed ? ". Cleanup available." : "."}`;
+        }
+        return quality;
+      }
+
+      function cleanReferenceField() {
+        const quality = referenceQuality(referenceTranscriptInput.value);
+        referenceTranscriptInput.value = quality.cleaned;
+        updateReferenceQuality();
+      }
+
+      function updateQueueControls() {
+        const selectedCount = selectedCandidateIds.size;
+        queueButton.disabled = selectedCount === 0 || queueActive;
+        clearQueueButton.disabled = selectedCount === 0 && !queueActive;
+        saveNextButton.disabled = !queueActive || queueIndex < 0 || queueIndex >= reviewQueue.length;
+        if (queueActive) {
+          setQueueMessage(`Reviewing ${queueIndex + 1} of ${reviewQueue.length}. Correct transcript, then Save & Next Draft.`);
+        } else if (selectedCount) {
+          setQueueMessage(`${selectedCount} candidate${selectedCount === 1 ? "" : "s"} selected for ASR review.`);
+        } else {
+          setQueueMessage("Search videos, select candidates, then start a review queue.");
+        }
+      }
+
+      function setThumbnailPreview(url) {
+        currentThumbnailUrl = String(url || "").trim();
+        thumbnailPreview.innerHTML = "";
+        if (!currentThumbnailUrl) {
+          const placeholder = document.createElement("span");
+          placeholder.textContent = "No thumbnail loaded";
+          thumbnailPreview.appendChild(placeholder);
+          return;
+        }
+        const image = document.createElement("img");
+        image.src = currentThumbnailUrl;
+        image.alt = "YouTube thumbnail";
+        image.onerror = () => {
+          thumbnailPreview.innerHTML = "<span>Thumbnail could not be loaded</span>";
+        };
+        thumbnailPreview.appendChild(image);
+      }
+
+      function renderCandidates(candidates) {
+        candidateList.innerHTML = "";
+        selectedCandidateIds = new Set(candidates.map((candidate) => candidate.video_id).filter(Boolean));
+        candidates.forEach((candidate, index) => {
+          const item = document.createElement("article");
+          item.className = "candidate-item";
+          item.innerHTML = `
+            <div class="candidate-thumb">
+              ${candidate.thumbnail_url ? `<img src="${escapeHtml(candidate.thumbnail_url)}" alt="">` : "<span>No thumbnail</span>"}
+            </div>
+            <div class="candidate-body">
+              <label class="candidate-check">
+                <input type="checkbox" ${candidate.video_id ? "checked" : ""}>
+                <span>Queue</span>
+              </label>
+              <strong>${escapeHtml(candidate.title || "Untitled video")}</strong>
+              <p>${escapeHtml(candidate.channel_title || "Unknown channel")} ${candidate.published_at ? `- ${escapeHtml(candidate.published_at.slice(0, 10))}` : ""}</p>
+              <div class="tester-actions candidate-actions">
+                <button type="button" class="secondary-button">Use URL</button>
+                <a href="${escapeHtml(candidate.url)}" target="_blank" rel="noreferrer">Open YouTube</a>
+              </div>
+            </div>
+          `;
+          item.querySelector("input").addEventListener("change", (event) => {
+            if (!candidate.video_id) return;
+            if (event.target.checked) {
+              selectedCandidateIds.add(candidate.video_id);
+            } else {
+              selectedCandidateIds.delete(candidate.video_id);
+            }
+            updateQueueControls();
+          });
+          item.querySelector("button").addEventListener("click", async () => {
+            selectCandidate(candidate, index);
+            await loadVideo();
+          });
+          candidateList.appendChild(item);
+        });
+        updateQueueControls();
+      }
+
+      function selectCandidate(candidate, index = 0) {
+        youtubeUrlInput.value = candidate.url || "";
+        currentVideoId = candidate.video_id || "";
+        titleInput.value = candidate.title || "";
+        descriptionInput.value = candidate.description || "";
+        setThumbnailPreview(candidate.thumbnail_url || "");
+        document.querySelectorAll(".candidate-item").forEach((item, itemIndex) => {
+          item.classList.toggle("selected", itemIndex === index);
+        });
+        setMessage(sourceStatus, `Generated URL for ${candidate.video_id || "video"}.`);
+        setWorkflowStep("load");
+      }
+
+      function clearDraftFields() {
+        whisperTranscriptInput.value = "";
+        referenceTranscriptInput.value = "";
+        audioPathInput.value = "";
+        durationInput.value = "";
+        warningsPanel.hidden = true;
+        updateReferenceQuality();
+        clearError();
+      }
+
+      function selectedCandidates() {
+        return latestCandidates.filter((candidate) => selectedCandidateIds.has(candidate.video_id));
+      }
+
+      async function startReviewQueue() {
+        clearError();
+        reviewQueue = selectedCandidates();
+        if (!reviewQueue.length) {
+          setQueueMessage("Select at least one candidate first.", true);
+          return;
+        }
+        queueActive = true;
+        queueIndex = 0;
+        updateQueueControls();
+        await loadQueueCandidate();
+      }
+
+      async function loadQueueCandidate() {
+        if (!queueActive || queueIndex < 0 || queueIndex >= reviewQueue.length) {
+          queueActive = false;
+          queueIndex = -1;
+          updateQueueControls();
+          setQueueMessage("Review queue complete. Search again to collect more drafts.");
+          return;
+        }
+        const candidate = reviewQueue[queueIndex];
+        const candidateIndex = latestCandidates.findIndex((item) => item.video_id === candidate.video_id);
+        clearDraftFields();
+        selectCandidate(candidate, candidateIndex >= 0 ? candidateIndex : 0);
+        setQueueMessage(`Preparing ${queueIndex + 1} of ${reviewQueue.length}: ${candidate.video_id}.`);
+        const loaded = await loadVideo();
+        if (!loaded) {
+          setQueueMessage(`Could not load ${candidate.video_id}. Fix the URL manually or Clear Queue.`, true);
+          return;
+        }
+        const generated = await generateTranscript(false);
+        if (!generated) {
+          setQueueMessage(`Audio prepared or transcript failed for ${candidate.video_id}. You can paste/fix the reference, then Save & Next Draft.`, true);
+          return;
+        }
+        setQueueMessage(`Draft ready ${queueIndex + 1} of ${reviewQueue.length}. Correct the reference transcript, then Save & Next Draft.`);
+      }
+
+      async function advanceQueue() {
+        if (!queueActive) return;
+        queueIndex += 1;
+        if (queueIndex >= reviewQueue.length) {
+          queueActive = false;
+          queueIndex = -1;
+          reviewQueue = [];
+          updateQueueControls();
+          setQueueMessage("Review queue complete. Search again to collect more drafts.");
+          return;
+        }
+        updateQueueControls();
+        await loadQueueCandidate();
+      }
+
+      function clearReviewQueue() {
+        queueActive = false;
+        queueIndex = -1;
+        reviewQueue = [];
+        selectedCandidateIds = new Set();
+        candidateList.querySelectorAll("input[type='checkbox']").forEach((checkbox) => {
+          checkbox.checked = false;
+        });
+        updateQueueControls();
+      }
+
+      async function autoGenerateUrl(useNextPage = false) {
+        clearError();
+        autoUrlButton.disabled = true;
+        nextUrlButton.disabled = true;
+        autoUrlButton.textContent = "Searching...";
+        setMessage(sourceStatus, "Searching YouTube for ASR candidates...");
+        try {
+          const response = await fetch("/api/asr-youtube-candidates", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              topic: autoTopicInput.value,
+              query: autoQueryInput.value,
+              max_results: Number(autoLimitInput.value || 10),
+              page_token: useNextPage ? nextPageToken : "",
+              exclude_saved: true
+            })
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            showError(data.error || "Could not generate a YouTube URL.", data);
+            setMessage(sourceStatus, data.error || "Could not generate a YouTube URL.", true);
+            return;
+          }
+          latestCandidates = data.candidates || [];
+          nextPageToken = (data.search_meta || {}).next_page_token || "";
+          nextUrlButton.disabled = !nextPageToken;
+          renderCandidates(latestCandidates);
+          if (!latestCandidates.length) {
+            setMessage(sourceStatus, "No unsaved ASR candidates found. Try another query.", true);
+            showPayload(data);
+            return;
+          }
+          selectCandidate(latestCandidates[0], 0);
+          setMessage(sourceStatus, `Auto-generated ${latestCandidates[0].video_id}. ${data.excluded_count || 0} saved videos skipped.`);
+          showPayload(data);
+        } catch (error) {
+          showError(error.message);
+          setMessage(sourceStatus, error.message, true);
+        } finally {
+          autoUrlButton.disabled = false;
+          autoUrlButton.textContent = "Auto Generate URL";
+          nextUrlButton.disabled = !nextPageToken;
+        }
+      }
+
+      async function refreshSummary() {
+        const response = await fetch("/api/asr-samples");
+        const data = await response.json();
+        const splits = data.split_counts || {};
+        const testCount = Number(splits.test || 0);
+        manifestText.textContent = `${data.row_count || 0} samples. train=${splits.train || 0}, validation=${splits.validation || 0}, test=${testCount}.`;
+        testMeterFill.style.width = `${Math.min(testCount / 10, 1) * 100}%`;
+        testMeterText.textContent = `${testCount} of 10 test samples.`;
+        showPayload(data);
+      }
+
+      async function loadVideo() {
+        const url = youtubeUrlInput.value.trim();
+        if (!url) {
+          showError("Paste a YouTube URL first.");
+          return false;
+        }
+        clearError();
+        loadButton.disabled = true;
+        loadButton.textContent = "Loading...";
+        setMessage(sourceStatus, "Loading YouTube metadata...");
+        try {
+          const response = await fetch("/api/youtube-metadata", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              url,
+              require_youtube_api: true,
+              use_audio_fallback: false,
+              page_data: {}
+            })
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            showError(data.error || "Could not load YouTube metadata.", data);
+            setMessage(sourceStatus, data.error || "Could not load YouTube metadata.", true);
+            return false;
+          }
+          currentVideoId = data.video_id || "";
+          titleInput.value = data.title || "";
+          descriptionInput.value = data.description || "";
+          setThumbnailPreview(data.thumbnail_url || "");
+          setMessage(sourceStatus, `Loaded ${currentVideoId || "video"}.`);
+          setWorkflowStep("transcribe");
+          emptyState.hidden = true;
+          samplePanel.hidden = false;
+          sampleText.textContent = `Video ${currentVideoId || ""} loaded.`;
+          warningsPanel.hidden = !(data.warnings || []).length;
+          warningsText.textContent = (data.warnings || []).join(" ");
+          showPayload(data);
+          return true;
+        } catch (error) {
+          showError(error.message);
+          setMessage(sourceStatus, error.message, true);
+          return false;
+        } finally {
+          loadButton.disabled = false;
+          loadButton.textContent = "Load";
+        }
+      }
+
+      async function generateTranscript(forceRefresh = false) {
+        const url = youtubeUrlInput.value.trim();
+        if (!currentVideoId && !url) {
+          showError("Load or paste a YouTube URL first.");
+          return false;
+        }
+        clearError();
+        generateButton.disabled = true;
+        refreshButton.disabled = true;
+        generateButton.textContent = forceRefresh ? "Regenerating..." : "Generating...";
+        const progressTimer = startTranscriptProgress(whisperStatus);
+        try {
+          const response = await fetch("/api/youtube-transcript-whisper", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              url,
+              video_id: currentVideoId,
+              force_refresh: forceRefresh
+            })
+          });
+          const data = await response.json();
+          currentVideoId = data.video_id || currentVideoId;
+          audioPathInput.value = data.audio_path || audioPathInput.value;
+          durationInput.value = data.audio_duration_seconds || durationInput.value;
+          runtimeInput.value = data.runtime || runtimeInput.value;
+          modelNameInput.value = data.model_name || modelNameInput.value;
+          if (data.transcript) {
+            whisperTranscriptInput.value = data.transcript;
+            if (!referenceTranscriptInput.value.trim()) {
+              referenceTranscriptInput.value = cleanReferenceTranscript(data.transcript);
+            }
+            updateReferenceQuality();
+          }
+          if (!response.ok) {
+            showError(data.error || (data.warnings || []).join(" ") || "Whisper transcript failed.", data);
+            setMessage(whisperStatus, data.error || (data.warnings || []).join(" ") || "Whisper transcript failed.", true);
+            return false;
+          }
+          setMessage(whisperStatus, `Generated with ${data.runtime || "whisper"} ${data.model_name || ""}.`);
+          warningsPanel.hidden = !(data.warnings || []).length;
+          warningsText.textContent = (data.warnings || []).join(" ");
+          samplePanel.hidden = false;
+          sampleText.textContent = `${data.audio_duration_seconds || 0}s audio ready for ${splitInput.value}.`;
+          setWorkflowStep("review");
+          showPayload(data);
+          return true;
+        } catch (error) {
+          showError(error.message);
+          setMessage(whisperStatus, error.message, true);
+          return false;
+        } finally {
+          stopTranscriptProgress(progressTimer);
+          generateButton.disabled = false;
+          refreshButton.disabled = false;
+          generateButton.textContent = "Generate Transcript";
+        }
+      }
+
+      async function saveSample(event = null) {
+        if (event) event.preventDefault();
+        clearError();
+        cleanReferenceField();
+        const quality = updateReferenceQuality();
+        if (quality.errors.length) {
+          showError(`Clean Sinhala reference transcript required: ${quality.errors.join(" ")}`);
+          return null;
+        }
+        saveButton.disabled = true;
+        saveNextButton.disabled = true;
+        saveButton.textContent = "Saving...";
+        try {
+          const response = await fetch("/api/asr-samples", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              video_id: currentVideoId,
+              url: youtubeUrlInput.value,
+              audio_path: audioPathInput.value,
+              transcript: referenceTranscriptInput.value,
+              split: splitInput.value,
+              source: sourceInput.value,
+              duration_seconds: durationInput.value
+            })
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            showError(data.error || "Could not save ASR sample.", data);
+            return null;
+          }
+          samplePanel.hidden = false;
+          sampleText.textContent = data.message || "Saved ASR sample.";
+          setWorkflowStep("save");
+          showPayload(data);
+          await refreshSummary();
+          return data;
+        } catch (error) {
+          showError(error.message);
+          return null;
+        } finally {
+          saveButton.disabled = false;
+          updateQueueControls();
+          saveButton.textContent = "Save ASR Sample";
+        }
+      }
+
+      async function saveAndNext() {
+        const saved = await saveSample();
+        if (saved) {
+          await advanceQueue();
+        }
+      }
+
+      function clearForm() {
+        youtubeUrlInput.value = "";
+        titleInput.value = "";
+        descriptionInput.value = "";
+        whisperTranscriptInput.value = "";
+        referenceTranscriptInput.value = "";
+        audioPathInput.value = "";
+        durationInput.value = "";
+        currentVideoId = "";
+        latestCandidates = [];
+        selectedCandidateIds = new Set();
+        reviewQueue = [];
+        queueIndex = -1;
+        queueActive = false;
+        candidateList.innerHTML = "";
+        setThumbnailPreview("");
+        setMessage(sourceStatus, "Ready.");
+        setMessage(whisperStatus, "Ready.");
+        updateReferenceQuality();
+        samplePanel.hidden = true;
+        warningsPanel.hidden = true;
+        jsonPanel.hidden = true;
+        clearError();
+        emptyState.hidden = false;
+        updateQueueControls();
+        setWorkflowStep("load");
+      }
+
+      copyDraftButton.addEventListener("click", () => {
+        referenceTranscriptInput.value = cleanReferenceTranscript(whisperTranscriptInput.value);
+        updateReferenceQuality();
+        setWorkflowStep("review");
+      });
+      cleanReferenceButton.addEventListener("click", cleanReferenceField);
+      referenceTranscriptInput.addEventListener("input", updateReferenceQuality);
+      autoTopicInput.addEventListener("change", () => {
+        autoQueryInput.value = topicSearchQueries[autoTopicInput.value] || "";
+        nextPageToken = "";
+        nextUrlButton.disabled = true;
+      });
+      autoUrlButton.addEventListener("click", () => autoGenerateUrl(false));
+      nextUrlButton.addEventListener("click", () => autoGenerateUrl(true));
+      queueButton.addEventListener("click", startReviewQueue);
+      clearQueueButton.addEventListener("click", clearReviewQueue);
+      toggleJsonButton.addEventListener("click", () => {
+        jsonPanel.hidden = !jsonPanel.hidden;
+        toggleJsonButton.textContent = jsonPanel.hidden ? "Show JSON" : "Hide JSON";
+        if (!jsonPanel.hidden && latestPayload) {
+          jsonOutput.textContent = JSON.stringify(latestPayload, null, 2);
+        }
+      });
+      loadButton.addEventListener("click", loadVideo);
+      generateButton.addEventListener("click", () => generateTranscript(false));
+      refreshButton.addEventListener("click", () => generateTranscript(true));
+      saveNextButton.addEventListener("click", saveAndNext);
+      clearButton.addEventListener("click", clearForm);
+      form.addEventListener("submit", saveSample);
+      autoQueryInput.value = topicSearchQueries[autoTopicInput.value] || "";
+      setWorkflowStep("load");
+      updateQueueControls();
+      refreshSummary();
+    </script>
+  </body>
+</html>

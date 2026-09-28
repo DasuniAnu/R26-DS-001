@@ -1,0 +1,14 @@
+flask==3.0.0
+transformers==4.40.0
+torch==2.2.0
+streamlit==1.32.0
+requests==2.31.0
+pandas==2.0.0
+numpy==1.24.0
+scikit-learn==1.3.0
+librosa==0.10.1
+openai-whisper==20231117
+joblib==1.3.0
+imbalanced-learn==0.11.0
+soundfile==0.12.1
+noisereduce==2.0.1

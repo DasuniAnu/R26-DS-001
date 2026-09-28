@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sinhala False-Content Detector</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace" aria-labelledby="page-title">
+        <header class="topbar">
+          <div class="brand">
+            <img src="{{ url_for('static', filename='mark.svg') }}" alt="" class="brand-mark">
+            <div>
+              <h1 id="page-title">Sinhala YouTube False-Content Detector</h1>
+              <p>Binary detection for False vs Not False Sinhala video content.</p>
+            </div>
+          </div>
+          <div class="status-pills" aria-label="Available model artifacts">
+            <span class="pill {{ 'ready' if models.text else 'missing' }}">Text</span>
+            <span class="pill {{ 'ready' if models.multimodal else 'missing' }}">Multimodal</span>
+          </div>
+        </header>
+
+        <div class="content-grid">
+          <form class="prediction-form" action="{{ url_for('predict_form') }}" method="post" enctype="multipart/form-data">
+            <fieldset>
+              <legend>Model</legend>
+              <div class="segmented-control">
+                <label>
+                  <input type="radio" name="model_type" value="text" {{ 'checked' if default_model == 'text' else '' }} {{ 'disabled' if not models.text else '' }}>
+                  <span>Text</span>
+                </label>
+                <label>
+                  <input type="radio" name="model_type" value="multimodal" {{ 'checked' if default_model == 'multimodal' else '' }} {{ 'disabled' if not models.multimodal else '' }}>
+                  <span>Multimodal</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <label>
+              <span>Title</span>
+              <input name="title" value="{{ form_data.title or '' }}" autocomplete="off">
+            </label>
+
+            <label>
+              <span>Description</span>
+              <textarea name="description" rows="4">{{ form_data.description or '' }}</textarea>
+            </label>
+
+            <label>
+              <span>Transcript</span>
+              <textarea name="transcript" rows="7">{{ form_data.transcript or '' }}</textarea>
+            </label>
+
+            <div class="thumbnail-fields">
+              <label>
+                <span>Thumbnail URL or path</span>
+                <input name="thumbnail" value="{{ form_data.thumbnail or '' }}" autocomplete="off">
+              </label>
+              <label class="file-input">
+                <span>Upload thumbnail</span>
+                <input type="file" name="thumbnail_file" accept="image/*">
+              </label>
+            </div>
+
+            <button type="submit">Predict</button>
+          </form>
+
+          <aside class="result-panel" aria-live="polite">
+            {% if error %}
+              <div class="message error">
+                <span class="message-label">Error</span>
+                <p>{{ error }}</p>
+              </div>
+            {% elif result %}
+              <div class="score-card label-{{ result.label | lower | replace(' ', '-') }}">
+                <span class="message-label">{{ result.model_type | title }} model</span>
+                <strong>{{ result.label }}</strong>
+                <div class="meter" aria-label="Confidence">
+                  <span style="width: {{ (result.confidence * 100) | round(1) }}%"></span>
+                </div>
+                <p>{{ (result.confidence * 100) | round(1) }}% confidence</p>
+              </div>
+              {% if result.warnings %}
+                <div class="message">
+                  <span class="message-label">Warnings</span>
+                  <p>{{ result.warnings | join(' ') }}</p>
+                </div>
+              {% endif %}
+              {% if result.evidence_signals %}
+                <div class="message">
+                  <span class="message-label">Evidence Signals</span>
+                  <p>
+                    {% for signal in result.evidence_signals %}
+                      {{ signal.name }}={{ signal.status }}{% if not loop.last %}; {% endif %}
+                    {% endfor %}
+                  </p>
+                </div>
+              {% endif %}
+            {% else %}
+              <div class="empty-state">
+                <div class="signal-bars" aria-hidden="true">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+                <p>Results appear here after prediction.</p>
+              </div>
+            {% endif %}
+
+            <div class="api-panel">
+              <h2>API</h2>
+              <code>POST /api/predict</code>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

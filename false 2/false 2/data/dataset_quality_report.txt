@@ -1,0 +1,49 @@
+Sinhala YouTube Content Match Dataset Quality Report
+
+total samples: 10000
+MATCH label 0 samples: 5000
+MISMATCH label 1 samples: 5000
+exact duplicate rows: 0
+duplicate titles: 0
+duplicate transcripts: 0
+near duplicate transcript pairs in first 1200 rows at cosine >= 0.96: 1
+
+missing values:
+- video_id: 0
+- group_id: 0
+- title: 0
+- description: 0
+- transcript: 0
+- label: 0
+- topic: 0
+- hard_negative_type: 0
+
+average transcript word length per class:
+- label 0: 296.4
+- label 1: 296.5
+
+topic distribution by label:
+- label 0: {'AI': 119, 'Agriculture': 212, 'Business': 120, 'Celebrity news': 120, 'Cricket': 210, 'Crime': 212, 'Economics': 119, 'Education': 304, 'Entertainment': 119, 'Finance': 304, 'Food': 119, 'Government': 211, 'Health': 211, 'History': 118, 'Jobs': 211, 'Lifestyle': 119, 'Mobile phones': 212, 'Politics': 212, 'Religion': 211, 'Science': 120, 'Social media': 119, 'Sports': 212, 'Sri Lankan news': 119, 'Technology': 306, 'Travel': 120, 'University': 118, 'Vehicles': 211, 'Weather': 212}
+- label 1: {'AI': 119, 'Agriculture': 212, 'Business': 120, 'Celebrity news': 120, 'Cricket': 210, 'Crime': 212, 'Economics': 119, 'Education': 304, 'Entertainment': 119, 'Finance': 304, 'Food': 119, 'Government': 211, 'Health': 211, 'History': 118, 'Jobs': 211, 'Lifestyle': 119, 'Mobile phones': 212, 'Politics': 212, 'Religion': 211, 'Science': 120, 'Social media': 119, 'Sports': 212, 'Sri Lankan news': 119, 'Technology': 306, 'Travel': 120, 'University': 118, 'Vehicles': 211, 'Weather': 212}
+
+hard-negative fact changes:
+- event: 186
+- health_or_financial_claim: 184
+- location: 186
+- main_topic: 185
+- none: 8333
+- number: 186
+- person: 186
+- product: 186
+- result_or_outcome: 184
+- time_period: 184
+
+label leakage term hits in transcript:
+- mismatch: 0
+- matching: 0
+- unrelated content: 0
+- label: 0
+- false: 0
+
+generation problems found:
+- none

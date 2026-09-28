@@ -1,0 +1,394 @@
+SINHALA YOUTUBE CONTENT CONSISTENCY DETECTION
+Panel Presentation Kit
+
+Recommended duration: 8–10 minutes presentation + demonstration + questions
+
+
+CORE MESSAGE
+
+This project is an end-to-end Sinhala-first screening system that checks whether a YouTube video's title and description are supported by its transcript. Its contribution is not an unsupported claim of perfect fact-checking; it is a practical, evidence-aware workflow that connects data collection, text processing, classification, human-review signals, a web interface, an API, and a Chrome extension.
+
+
+SLIDE 1 — TITLE
+
+Visible content
+
+Sinhala YouTube Content Consistency Detection
+A practical screening tool for comparing video claims with spoken content
+
+Final Project Presentation • 2026
+
+What to say
+
+“Good morning. My project addresses a practical problem in Sinhala online video: a title can make a strong claim while the spoken content says something different. I built an end-to-end system that compares the title and description with the transcript, then produces a simple result with confidence and evidence warnings.”
+
+
+SLIDE 2 — THE PROBLEM IS A MISMATCH BETWEEN PROMISE AND CONTENT
+
+Visible content
+
+Viewers often decide whether to trust or watch a video from its title and description.
+
+The challenge:
+
+• A dramatic title may not be supported by the transcript.
+• Manual comparison is slow for long Sinhala videos.
+• Sinhala-language tooling and labeled resources are limited.
+
+Project question
+
+Can a system automatically identify when the available transcript does not sufficiently support the video's metadata?
+
+What to say
+
+“I deliberately narrowed the problem. Instead of claiming to prove whether every statement in the world is true, the system asks a measurable question: does the spoken content support what the title and description promise? This makes the project technically defensible and useful as a first-stage screening tool.”
+
+
+SLIDE 3 — THE OUTPUT IS A CONSISTENCY JUDGMENT, NOT A VERDICT ON TRUTH
+
+Visible content
+
+Inputs
+
+Title + Description + Transcript
+
+Output
+
+False — the metadata is not sufficiently supported by the transcript
+Not False — the available fields are aligned enough
+
+Also returned
+
+Confidence • class probabilities • evidence signals • review recommendation
+
+Boundary
+
+The system detects internal content mismatch; it does not replace external fact-checking.
+
+What to say
+
+“This definition is important. Here, ‘False’ means insufficient support or inconsistency between the available fields. It does not automatically mean every real-world claim in the video is false. The interface therefore gives a review recommendation instead of making an irreversible decision.”
+
+
+SLIDE 4 — THE PIPELINE TURNS A YOUTUBE VIDEO INTO REVIEWABLE EVIDENCE
+
+Visible content
+
+1. Acquire
+YouTube URL, title, description, public captions
+
+2. Understand
+Clean Sinhala text, normalize common English terms, compute cross-field similarity
+
+3. Decide
+Classify as False or Not False and calculate confidence
+
+4. Present
+Show evidence signals, warnings, and a human-review recommendation
+
+Fallback
+
+If captions are unavailable, the user may explicitly generate a transcript with Whisper or continue without one.
+
+What to say
+
+“The workflow starts from a YouTube URL or manual input. Public captions are preferred because they are faster and avoid unnecessary audio processing. If captions are missing, the user chooses whether to generate a transcript. That explicit choice is both a usability and a responsible-computing decision.”
+
+
+SLIDE 5 — TEXT CONSISTENCY IS MODELED AT BOTH WORD AND CHARACTER LEVELS
+
+Visible content
+
+Live runtime
+
+• Word n-grams capture meaningful phrases.
+• Character n-grams handle spelling variation and mixed Sinhala–English text.
+• Logistic regression provides fast, explainable, CPU-friendly inference.
+
+Research path
+
+• XLM-RoBERTa fine-tuning pipeline is included for deeper contextual modeling.
+• The model input preserves title, description, transcript, and consistency features as separate sections.
+
+Engineering choice
+
+The demonstration uses the self-contained fast model so it loads reliably on ordinary hardware.
+
+What to say
+
+“For the live application, I use a word-and-character TF-IDF representation with logistic regression. Character features are useful for spelling variation and code-mixed text. The repository also includes an XLM-RoBERTa training path, but the fast model is the safer choice for a reliable CPU demonstration.”
+
+
+SLIDE 6 — THE SYSTEM IS DESIGNED TO RESIST EASY SHORTCUTS
+
+Visible content
+
+Three safeguards
+
+Group-aware splitting
+Related samples stay in one split to reduce leakage.
+
+Quality checks
+Schema validation, missing-value checks, duplicate checks, balanced labels, and topic reports.
+
+Hard cases
+Same-topic examples can differ by a decisive person, number, place, product, time period, or outcome.
+
+Evidence-aware behavior
+
+Missing transcripts, missing sources, and low confidence trigger warnings or human review.
+
+What to say
+
+“A classifier can look impressive by learning shortcuts. I therefore keep related examples together during splitting and run data-quality checks before training. I also include difficult same-topic mismatches, where only one important fact changes. At inference time, weak evidence is not hidden; it produces a warning.”
+
+
+SLIDE 7 — THE RESULT IS A COMPLETE WORKING PRODUCT, NOT ONLY A MODEL
+
+Visible content
+
+Web application
+Manual analysis, YouTube loading, result confidence, evidence signals
+
+REST API
+Reusable prediction and YouTube-processing endpoints
+
+Chrome extension
+Analyze the current YouTube page from the browser
+
+Data workflow
+Candidate collection, human labeling, validation, and ASR manifest tools
+
+What to say
+
+“The model is only one part of the contribution. I built the surrounding system needed to use and improve it: a Flask application, REST endpoints, a Chrome extension, data-labeling screens, caption collection, transcript handling, and evaluation utilities.”
+
+
+SLIDE 8 — ENGINEERING EVIDENCE SHOWS THE PIPELINE IS TESTABLE AND INTEGRATED
+
+Visible content
+
+39
+Automated tests passed
+
+27
+Flask routes across inference, YouTube ingestion, labeling, and ASR
+
+3
+Core evidence channels: title, description, transcript
+
+Tested behaviors include
+
+• Binary label mapping
+• Sinhala normalization and similarity features
+• YouTube caption and metadata handling
+• Transcript fallback and caching
+• API validation and labeling workflows
+• Group separation and ASR manifest quality
+
+What to say
+
+“Before this presentation I ran the complete automated test suite: 39 tests passed, with three optional model-runtime tests skipped because they require a separate heavy dependency configuration. The application exposes 27 routes and the live API correctly returned both label classes for checked cases. These are engineering verification results, not claims of real-world classification accuracy.”
+
+
+SLIDE 9 — LIVE DEMONSTRATION: FOLLOW THE EVIDENCE, NOT ONLY THE LABEL
+
+Visible content
+
+Demo sequence
+
+1. Open the examiner page.
+2. Load a YouTube URL or paste a prepared case.
+3. Point out title, description, and transcript.
+4. Click Analyze.
+5. Explain the label, confidence, evidence signals, and review recommendation.
+6. Change one decisive fact in the title and analyze again.
+
+Panel takeaway
+
+The useful output is the combination of prediction + evidence quality + review guidance.
+
+What to say
+
+“I will first show an aligned example, then change one decisive fact in the title while keeping the transcript. The goal is not to impress with a confidence number; it is to show how the system responds to the relationship between the fields and how it warns when evidence is incomplete.”
+
+
+SLIDE 10 — LIMITATIONS ARE CLEAR, AND EACH ONE HAS A TECHNICAL NEXT STEP
+
+Visible content
+
+Current limitation                  Next step
+
+Limited independent real-video benchmark
+Expand double-annotated Sinhala test data and report inter-annotator agreement
+
+Caption quality varies
+Measure caption source quality and improve the Sinhala ASR benchmark
+
+Confidence needs external calibration
+Calibrate thresholds on an unseen human-labeled test set
+
+Text-first active version
+Reactivate thumbnail fusion after collecting real, licensed thumbnail examples
+
+Consistency is not factual verification
+Add retrieval from trusted sources for claim-level fact checking
+
+What to say
+
+“The current prototype proves the workflow, but I do not treat its development score as real-world performance. The next scientific milestone is an independent, human-labeled Sinhala benchmark. I would also improve ASR evaluation, calibrate confidence, and only reactivate the image branch when the right thumbnail data is available.”
+
+
+SLIDE 11 — THE CONTRIBUTION IS SINHALA-FIRST, EVIDENCE-AWARE, AND DEPLOYABLE
+
+Visible content
+
+Sinhala-first
+Unicode-safe processing, mixed-language normalization, caption and ASR workflow
+
+Evidence-aware
+Compares metadata with transcript and exposes missing evidence
+
+End-to-end
+Collection → labeling → training → API → web app → browser extension
+
+Responsible by design
+Human review remains part of the decision path
+
+What to say
+
+“The contribution is the combination of language focus, a defensible task definition, robust engineering, and a usable delivery path. It is not a notebook that ends after training; it is a system that can be demonstrated, tested, audited, and improved.”
+
+
+SLIDE 12 — CLOSING
+
+Visible content
+
+A practical first step toward safer Sinhala video discovery
+
+The system converts a vague concern—‘this title feels misleading’—into a repeatable comparison between what a video promises and what it actually says.
+
+Ready for questions and demonstration
+
+What to say
+
+“To conclude, this project turns a subjective concern into a repeatable, reviewable workflow. It does not overclaim perfect truth detection. Its value is that it gives Sinhala users and researchers a practical starting point, makes evidence gaps visible, and provides a clear path toward stronger real-world validation.”
+
+
+LIVE DEMO CHECKLIST
+
+Before entering the room
+
+• Start the Flask server and open http://127.0.0.1:5000/youtube.
+• Keep a second tab open at http://127.0.0.1:5000/health.
+• Prepare one aligned case and one clearly mismatched case locally.
+• Do not depend on the panel-room internet connection.
+• Keep screenshots or a short screen recording as backup.
+• Disable notifications and browser autofill popups.
+• Increase browser zoom until the panel can read the result.
+
+During the demo
+
+• Begin with a result that you already tested.
+• Explain the three inputs before clicking Analyze.
+• Point to evidence warnings before discussing confidence.
+• Show only one controlled change between examples.
+• Stop after the contrast is clear; do not keep experimenting live.
+
+If the demo fails
+
+Say: “The live dependency is unavailable, so I will use the captured run. The automated test suite and API checks verify the same pipeline.” Then continue calmly.
+
+
+PANEL Q&A — STRONG, DEFENSIBLE ANSWERS
+
+1. Is this a fake-news detector?
+
+“Not in the broad external fact-checking sense. The current system detects whether the title and description are sufficiently supported by the transcript. Claim verification against trusted external sources is a planned extension.”
+
+2. Why did you choose a binary output?
+
+“A binary output supports a clear first-stage action: allow normal viewing or recommend review. Internally I still expose probabilities, evidence signals, and review recommendations so the result is not treated as an absolute verdict.”
+
+3. Which model is used in the live application?
+
+“The live application prefers a self-contained TF-IDF word-and-character model with logistic regression because it is fast and reliable on CPU. The repository also contains an XLM-RoBERTa fine-tuning pipeline for deeper contextual experiments.”
+
+4. Why use character n-grams?
+
+“They are useful for Sinhala spelling variation, inflection, tokenization differences, and Sinhala–English code mixing. Word n-grams capture phrases, while character n-grams add robustness.”
+
+5. What makes the project novel?
+
+“The novelty is not a new classifier formula by itself. It is the Sinhala-first task definition and the end-to-end integration of metadata–transcript consistency, evidence warnings, caption/ASR handling, human labeling, a REST API, a web interface, and a browser extension.”
+
+6. How did you prevent data leakage?
+
+“The preparation pipeline uses group-aware splitting, so related examples remain in the same split. It also checks exact duplicates, repeated titles and transcripts, missing values, and label distribution.”
+
+7. Why should we trust the accuracy?
+
+“The current results demonstrate that the pipeline can learn the development task, but I do not present them as real-world accuracy. A trustworthy performance claim requires a larger independent human-labeled Sinhala YouTube test set. That is the next evaluation milestone.”
+
+8. What data did you use?
+
+Use this answer if asked directly:
+
+“The prototype was developed primarily with a controlled generated development corpus, then supported by a small human-annotated real-video pilot. I keep those roles separate: the controlled corpus tests whether the pipeline learns the intended relationship, while an expanded independent real-video benchmark is required for real-world claims.”
+
+Do not evade this question or describe generated samples as real YouTube observations.
+
+9. Why is the image branch not active?
+
+“The current corpus does not provide the real thumbnail evidence needed for a defensible multimodal result. I therefore disabled image fusion in the active version instead of presenting an artificial multimodal claim. The code path remains ready for future data.”
+
+10. What happens when the transcript is missing?
+
+“The system first looks for public captions. The user can explicitly request a Whisper transcript or analyze without one. Missing evidence is reported as a warning and can trigger human review.”
+
+11. Is Whisper accurate enough for Sinhala?
+
+“Not yet for an unconditional accuracy claim in this project. It is a fallback mechanism. The correct next step is to expand the human-transcribed test set, report WER and CER by audio condition, and validate any fine-tuned model before relying on it.”
+
+12. Why not use only XLM-RoBERTa?
+
+“The deep model offers contextual capacity, but the compact runtime model is faster, easier to deploy, and reliable for a live CPU demo. The architecture lets me compare that baseline with XLM-RoBERTa rather than making deployment depend on one heavy model.”
+
+13. What are the main ethical risks?
+
+“False positives could unfairly flag a creator, and confidence can be misunderstood. That is why the output is framed as a consistency screening result, evidence gaps are visible, and uncertain or incomplete cases are sent to human review rather than automatic enforcement.”
+
+14. How would you evaluate it properly next?
+
+“I would sample real Sinhala videos across topics and channels, use at least two annotators with written consistency guidelines, measure agreement, reserve an untouched grouped test set, report per-class precision and recall with confidence intervals, and analyze errors by caption source and topic.”
+
+15. What would production deployment require?
+
+“A larger independent benchmark, calibrated thresholds, systematic monitoring, privacy and copyright review, secure API deployment, rate limiting, model-version tracking, and an appeals or correction workflow.”
+
+
+WORDS THAT INCREASE CREDIBILITY
+
+Use
+
+• “content consistency screening”
+• “supported by the available transcript”
+• “development benchmark”
+• “human-review recommendation”
+• “independent real-video validation is the next milestone”
+• “working end-to-end prototype”
+
+Avoid
+
+• “100% accurate”
+• “detects all fake news”
+• “trained on thousands of real YouTube videos”
+• “production ready”
+• “multimodal system” when discussing the active version
+• “Whisper is accurate for Sinhala” without validated evidence
+
+
+FINAL DELIVERY STYLE
+
+Stand slightly to the side of the screen. Open with the problem, not the technology. Speak in short sentences. Pause after the scope boundary because it signals scientific maturity. During technical slides, explain why each choice was made. During the limitations slide, sound deliberate rather than apologetic: a clearly scoped prototype with a credible validation plan is stronger than an exaggerated claim.
+

@@ -1,0 +1,13 @@
+# Minimal dependency list built from the actual imports found in
+# webapp/app.py, streamlit.py, and scripts/temporal_scoring.py — not
+# copied from roop/requirements.txt, which is for the separate
+# face-swap *generation* tool bundled in this project (used only to
+# create training data), not for running the detection backend/frontend.
+
+flask
+streamlit
+requests
+opencv-python
+tensorflow
+mtcnn
+numpy

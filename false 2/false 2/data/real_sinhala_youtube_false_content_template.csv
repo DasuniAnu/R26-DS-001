@@ -1,0 +1,2 @@
+video_id,url,title,description,transcript,topic,original_label,binary_label,label_source,annotator_notes,group_id
+VIDEO_ID,https://www.youtube.com/watch?v=VIDEO_ID,Example Sinhala title,Example description or empty,Example transcript or empty,Health,False,False,Human annotation,Explain the verified claim and evidence source,CLAIM_OR_EVENT_GROUP

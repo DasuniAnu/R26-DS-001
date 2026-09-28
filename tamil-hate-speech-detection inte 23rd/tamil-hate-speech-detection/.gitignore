@@ -1,0 +1,31 @@
+# Model files — too large for GitHub
+models/text_models/xlmr_saved/
+models/audio_models/audio_svm.pkl
+models/audio_models/audio_dnn.pt
+models/fusion_models/
+*.pt
+*.bin
+*.pkl
+
+# Data files
+data/text/
+data/audio/
+
+# Python
+__pycache__/
+*.py[cod]
+.env
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large audio/zip files
+*.wav
+*.mp3
+*.zip
