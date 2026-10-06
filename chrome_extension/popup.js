@@ -197,6 +197,55 @@ function commentsDetail(count, items, formatLine) {
   return wrap;
 }
 
+// Full video transcript (every 30-sec chunk, in order) — lets the user
+// copy-paste the actual Tamil speech into Google Translate to check the
+// real meaning themselves, independent of the verdict shown above.
+function buildFullTranscript(chunks) {
+  return (chunks || [])
+    .map((c) => `[${c.start_time}-${c.end_time}] ${(c.transcript || "").trim() || "(no speech detected)"}`)
+    .join("\n\n");
+}
+
+function transcriptCard(data) {
+  const card = document.createElement("div");
+  card.className = "result-card";
+  const heading = document.createElement("div");
+  heading.className = "title";
+  heading.textContent = "Full Video Transcription";
+  card.appendChild(heading);
+
+  const fullText = buildFullTranscript(data.chunks);
+  if (!fullText.trim()) {
+    card.appendChild(meta("No transcript available."));
+    return card;
+  }
+
+  card.appendChild(meta("Copy and paste into Google Translate to check the actual meaning yourself."));
+
+  const textarea = document.createElement("textarea");
+  textarea.className = "transcript-box";
+  textarea.readOnly = true;
+  textarea.value = fullText;
+  card.appendChild(textarea);
+
+  const copyBtn = document.createElement("button");
+  copyBtn.className = "copy-btn";
+  copyBtn.textContent = "📋 Copy Full Transcript";
+  copyBtn.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(fullText);
+    } catch (e) {
+      textarea.select();
+      document.execCommand("copy");
+    }
+    copyBtn.textContent = "✅ Copied!";
+    setTimeout(() => { copyBtn.textContent = "📋 Copy Full Transcript"; }, 1500);
+  });
+  card.appendChild(copyBtn);
+
+  return card;
+}
+
 // ── Summary strip: one compact stat per enabled check, at a glance ──
 function summaryCard(icon, label, valueText, cls) {
   const card = document.createElement("div");
@@ -253,7 +302,7 @@ function renderResults(state) {
       card.appendChild(badge(isHate ? "🔴 HATE SPEECH DETECTED" : "🟢 VIDEO IS SAFE", isHate ? "hate" : "safe"));
       if (data.hate_instances && data.hate_instances.length) {
         card.appendChild(instanceList(data.hate_instances, (i) =>
-          `<b>${i.timestamp}</b> · ${pct(i.confidence)} — "${i.sentence}"`
+          `<b>${i.timestamp}</b> · ${pct(i.confidence * 100)} — "${i.sentence}"`
         ));
       }
     }, state.startedAt));
@@ -267,6 +316,10 @@ function renderResults(state) {
         `${pct(c.confidence)} — "${c.text}"`
       ));
     }, state.startedAt));
+  }
+
+  if (state.tamil && state.tamil.status === "done") {
+    resultsEl.appendChild(transcriptCard(state.tamil.data));
   }
 
   if (state.sinhala) {

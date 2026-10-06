@@ -307,42 +307,91 @@ function watchComments() {
   commentObserver.observe(container, { childList: true, subtree: true });
 }
 
+// ── Self-healing after Chrome recycles the extension ────────
+// Manifest V3 extensions can be killed and restarted by Chrome at any time
+// (most often under memory pressure) even while a YouTube tab stays open.
+// When that happens, this already-injected content script becomes
+// "orphaned" — its chrome.* calls throw "Extension context invalidated"
+// forever, since there is no way for an orphaned script to reconnect to
+// the new extension instance. The only real fix is a fresh page load,
+// which injects a new content script bound to the current extension.
+// Rather than surface a console error and silently do nothing (the
+// previous behavior — confusing, and only noticed when a check never
+// starts), detect this proactively and reload automatically.
+function isExtensionContextValid() {
+  try {
+    return !!(chrome && chrome.runtime && chrome.runtime.id);
+  } catch (e) {
+    return false;
+  }
+}
+
+let reconnecting = false;
+function reconnectPage() {
+  if (reconnecting) return;
+  reconnecting = true;
+  try {
+    const body = ensurePanel();
+    body.innerHTML = '<div class="empty">⚠️ Extension was reloaded by Chrome — refreshing this page to reconnect...</div>';
+  } catch (e) {
+    // The panel itself may be unreachable at this point; the reload below
+    // is what actually matters.
+  }
+  setTimeout(() => location.reload(), 900);
+}
+
 // ── Storage-driven live updates ─────────────────────────────
 let watchedVideoId = null;
 
 async function refreshFromStorage() {
   if (!watchedVideoId) return;
-  const stored = await chrome.storage.local.get(storageKey(watchedVideoId));
-  const state = stored[storageKey(watchedVideoId)];
-  renderPanel(state);
-  if (state) {
-    lastFlaggedTexts = flaggedTextsFromState(state);
-    if (lastFlaggedTexts.length) {
-      applyCommentLabels(lastFlaggedTexts);
-      watchComments();
+  if (!isExtensionContextValid()) return reconnectPage();
+  try {
+    const stored = await chrome.storage.local.get(storageKey(watchedVideoId));
+    const state = stored[storageKey(watchedVideoId)];
+    renderPanel(state);
+    if (state) {
+      lastFlaggedTexts = flaggedTextsFromState(state);
+      if (lastFlaggedTexts.length) {
+        applyCommentLabels(lastFlaggedTexts);
+        watchComments();
+      }
     }
+  } catch (e) {
+    if (String(e.message || e).includes("Extension context invalidated")) reconnectPage();
   }
 }
 
-chrome.storage.onChanged.addListener((changes, area) => {
-  if (area !== "local" || !watchedVideoId) return;
-  if (changes[storageKey(watchedVideoId)]) refreshFromStorage();
-});
+try {
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== "local" || !watchedVideoId) return;
+    if (changes[storageKey(watchedVideoId)]) refreshFromStorage();
+  });
+} catch (e) {
+  // Context was already dead before this script finished initializing.
+  reconnectPage();
+}
 
 // ── Auto-run on every video, using saved settings ───────────
 async function maybeAutoStart(videoId, pageData) {
-  const stored = await chrome.storage.local.get(["settings", storageKey(videoId)]);
-  const settings = stored.settings;
-  if (!settings || (settings.hateLang === "off" && !settings.falseContent)) return; // nothing enabled
-  if (stored[storageKey(videoId)]) return; // already started/finished for this video
+  if (!isExtensionContextValid()) return reconnectPage();
+  try {
+    const stored = await chrome.storage.local.get(["settings", storageKey(videoId)]);
+    const settings = stored.settings;
+    if (!settings || (settings.hateLang === "off" && !settings.falseContent)) return; // nothing enabled
+    if (stored[storageKey(videoId)]) return; // already started/finished for this video
 
-  chrome.runtime.sendMessage({
-    type: "START_ANALYSIS",
-    payload: { videoId, tabUrl: pageData.url, pageData, settings }
-  });
+    chrome.runtime.sendMessage({
+      type: "START_ANALYSIS",
+      payload: { videoId, tabUrl: pageData.url, pageData, settings }
+    });
+  } catch (e) {
+    if (String(e.message || e).includes("Extension context invalidated")) reconnectPage();
+  }
 }
 
 async function onVideoReady() {
+  if (!isExtensionContextValid()) return reconnectPage();
   const data = collectYouTubePageData();
   if (!data.video_id) return;
   watchedVideoId = data.video_id;
@@ -359,8 +408,16 @@ document.addEventListener("yt-navigate-finish", () => {
 
 // Fallback in case yt-navigate-finish isn't available on some YouTube
 // versions: poll the URL for changes. Cheap, and only acts on a real change.
+// This same tick also doubles as the proactive health check — it runs
+// every 1.5s regardless of navigation, so a Chrome-recycled extension
+// gets detected and the page reloaded within ~1.5s, not whenever the user
+// next happens to click something.
 let lastUrl = location.href;
 setInterval(() => {
+  if (!isExtensionContextValid()) {
+    reconnectPage();
+    return;
+  }
   if (location.href !== lastUrl) {
     lastUrl = location.href;
     setTimeout(onVideoReady, 500);

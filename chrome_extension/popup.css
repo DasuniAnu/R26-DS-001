@@ -152,3 +152,17 @@ button#check:disabled {
 .comment-details summary::before { content: "▸ "; }
 .comment-details[open] summary::before { content: "▾ "; }
 .comment-details .instance-list { max-height: 160px; overflow-y: auto; }
+
+/* Full video transcript box + copy button */
+.transcript-box {
+  width: 100%; box-sizing: border-box; margin-top: 8px; resize: vertical;
+  min-height: 90px; max-height: 220px; font-size: 11px; line-height: 1.5;
+  color: #334155; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;
+  padding: 8px; font-family: inherit;
+}
+.copy-btn {
+  width: 100%; margin-top: 8px; border: 1.5px solid #2563eb; border-radius: 8px;
+  background: white; color: #2563eb; font-weight: 700; font-size: 12px;
+  padding: 7px 10px; cursor: pointer;
+}
+.copy-btn:hover { background: #eff6ff; }

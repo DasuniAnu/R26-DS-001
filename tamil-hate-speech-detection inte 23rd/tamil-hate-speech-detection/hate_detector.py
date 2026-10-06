@@ -47,7 +47,7 @@ class HateDetector:
         if use_lexicon:
             lex, reason = lexicon_check(text)
             if lex == 1:
-                return {"verdict": "HATE", "confidence": 1.0,
+                return {"verdict": "HATE", "confidence": 0.973,
                         "source": "lexicon", "reason": reason}
 
         # LAYER 2 — model
@@ -69,15 +69,14 @@ class HateDetector:
         return [p.strip() for p in parts if len(p.strip().split()) >= min_words]
 
     # ---------- ONE 30-second chunk ----------
-    def check_chunk(self, transcript, min_hate_sentences=2, strong_threshold=0.85, use_lexicon=True):
+    def check_chunk(self, transcript, strong_threshold=0.93, use_lexicon=True):
         """
         A chunk is HATE only if:
           - a real slur is found, OR
-          - 2 or more sentences are flagged, OR
-          - 1 sentence is flagged very strongly (>= 0.85)
+          - 1 sentence is flagged very strongly (>= 0.93)
 
-        This replaces the old rule where ONE flagged sentence marked the
-        whole chunk as hate.
+        Everything else is SAFE (no "2+ weaker sentences" rule, no UNCERTAIN
+        middle tier for video segments) — YouTube pipeline only.
         """
         sentences = self.split_sentences(transcript)
         if not sentences:
@@ -89,12 +88,7 @@ class HateDetector:
         has_slur = any(r["source"] == "lexicon" for _, r in flagged)
         has_strong = any(r["confidence"] >= strong_threshold for _, r in flagged)
 
-        # Chunk is binary: HATE if a slur/strong sentence/2+ flagged sentences
-        # fire, otherwise SAFE (no UNCERTAIN middle tier for video segments).
-        if has_slur or has_strong or len(flagged) >= min_hate_sentences:
-            verdict = "HATE"
-        else:
-            verdict = "SAFE"
+        verdict = "HATE" if (has_slur or has_strong) else "SAFE"
 
         worst = max(results, key=lambda x: x[1]["confidence"])
         return {

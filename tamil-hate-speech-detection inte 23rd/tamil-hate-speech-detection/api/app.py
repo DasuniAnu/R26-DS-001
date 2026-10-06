@@ -795,9 +795,8 @@ def _run_youtube_analysis(url, use_lexicon=True):
         if not transcription or transcription == "[no speech detected]":
             transcription = ""
 
-        # check_chunk(): HATE only if a Tier-1 slur fires, OR 2+ sentences are
-        # flagged, OR 1 sentence is flagged very strongly (>=0.85) — replaces
-        # the old "any single flagged sentence = hate chunk" rule.
+        # check_chunk(): HATE only if a Tier-1 slur fires, OR 1 sentence is
+        # flagged very strongly (>=0.93) — otherwise SAFE.
         result = youtube_detector.check_chunk(transcription, use_lexicon=use_lexicon)
 
         chunk_entry = {
