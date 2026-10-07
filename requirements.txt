@@ -1,19 +1,27 @@
-# Shared lightweight environment for the NEW integration layer only:
-# the gateway (reverse-proxy) and the frontend shell (unified Streamlit UI).
+# Combined environment for local dev AND Azure deployment.
 #
-# The Tamil and Sinhala backends are NOT installed here — they keep running
-# from their own existing, already-proven venvs, completely unchanged:
-#   - tamil-hate-speech-detection.../venv
-#   - AT final/.venv  (backend)
-#   - AT final/frontend/venv
-#
-# Versions below match what is already installed and working in those venvs
-# (verified via pip freeze), so the shell can call into both backends'
-# report-building code (which imports pandas/reportlab) without any
-# version mismatch.
+# Azure's build (Oryx) always installs from this root requirements.txt,
+# regardless of which subfolder's startup.sh actually runs — it does not
+# look inside deploy_backend/. So this file now also covers everything
+# Tamil + Sinhala need, not just the gateway/shell. Locally, the Tamil and
+# Sinhala backends still keep running from their own existing per-module
+# venvs unchanged; these extra packages are simply unused there.
 
 flask==3.1.3
+flask-cors>=4.0
 requests==2.33.1
 streamlit==1.57.0
 pandas==3.0.2
 reportlab==5.0.0
+transformers==4.40.0
+torch==2.2.0
+safetensors>=0.4
+numpy==1.24.0
+scikit-learn==1.3.0
+librosa==0.10.1
+openai-whisper==20231117
+joblib==1.3.0
+imbalanced-learn==0.11.0
+soundfile==0.12.1
+noisereduce==2.0.1
+yt-dlp>=2024.1
