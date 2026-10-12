@@ -16,7 +16,7 @@ python api/app.py > /tmp/tamil_backend.log 2>&1 &
 
 echo "Starting Sinhala backend on port 5001..."
 cd "$REPO_ROOT/AT final-4/AT final/backend"
-python app.py > /tmp/sinhala_backend.log 2>&1 &
+SINHALA_BACKEND_PORT=5001 python app.py > /tmp/sinhala_backend.log 2>&1 &
 
 # Give both a few seconds to finish loading their models before Gateway
 # starts accepting public traffic.
