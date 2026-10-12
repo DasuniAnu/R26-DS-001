@@ -27,7 +27,11 @@ from audio_utils import load_audio, SAMPLE_RATE, MAX_LENGTH
 
 # ── Paths ────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent
-MODELS_DIR = BASE_DIR / "models"
+
+# On Azure, models live in persistent storage outside the deployed code
+# (which is rebuilt fresh on every deploy) — SINHALA_MODELS_DIR points there
+# when set. This env var is never set locally, so local behavior is unchanged.
+MODELS_DIR = Path(os.environ.get("SINHALA_MODELS_DIR", str(BASE_DIR / "models")))
 
 TEXT_MODEL_PATH   = MODELS_DIR / "model_text_hatespeech" / "text_model_zip"
 AUDIO_HATE_PATH   = MODELS_DIR / "model_audio_hatespeech"

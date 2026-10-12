@@ -49,13 +49,19 @@ def _load_dotenv(path):
             os.environ.setdefault(key.strip(), value.strip())
 
 _load_dotenv(os.path.join(BASE_DIR, ".env"))
-TEXT_MODEL_PATH = os.path.join(BASE_DIR, "models", "text_models", "xlmr_saved")
-AUDIO_SCALER    = os.path.join(BASE_DIR, "models", "audio_models", "audio_scaler.pkl")
-AUDIO_SVM       = os.path.join(BASE_DIR, "models", "audio_models", "audio_svm.pkl")
-FUSION_AUDIO_MODEL = os.path.join(BASE_DIR, "models", "audio_models", "audio_model_combined_tuned.pkl")
-AUDIO_DNN       = os.path.join(BASE_DIR, "models", "audio_models", "audio_dnn.pt")
-FUSION_MODEL    = os.path.join(BASE_DIR, "models", "fusion_models", "fusion_final.pt")
-FUSION_SCALER   = os.path.join(BASE_DIR, "models", "fusion_models", "fusion_scaler_final.pkl")
+
+# On Azure, models live in persistent storage outside the deployed code
+# (which is rebuilt fresh on every deploy) — TAMIL_MODELS_DIR points there
+# when set. This env var is never set locally, so local behavior is unchanged.
+MODELS_ROOT = os.environ.get("TAMIL_MODELS_DIR", os.path.join(BASE_DIR, "models"))
+
+TEXT_MODEL_PATH = os.path.join(MODELS_ROOT, "text_models", "xlmr_saved")
+AUDIO_SCALER    = os.path.join(MODELS_ROOT, "audio_models", "audio_scaler.pkl")
+AUDIO_SVM       = os.path.join(MODELS_ROOT, "audio_models", "audio_svm.pkl")
+FUSION_AUDIO_MODEL = os.path.join(MODELS_ROOT, "audio_models", "audio_model_combined_tuned.pkl")
+AUDIO_DNN       = os.path.join(MODELS_ROOT, "audio_models", "audio_dnn.pt")
+FUSION_MODEL    = os.path.join(MODELS_ROOT, "fusion_models", "fusion_final.pt")
+FUSION_SCALER   = os.path.join(MODELS_ROOT, "fusion_models", "fusion_scaler_final.pkl")
 
 # Fallback ASR only — used when Sarvam AI fails. Stored on D: (not under the
 # project folder) since it's a large download kept off the low-space C: drive.
@@ -84,10 +90,10 @@ def _log_chunk_analysis(url, chunk_index, result):
 # YouTube-only fine-tuned text model + lexicon detector — used ONLY by /analyze_youtube
 # and /debug_sentence. Every other route (/predict_fusion, /analyze_document) keeps
 # using the original TEXT_MODEL_PATH above, unchanged.
-YOUTUBE_TEXT_MODEL_PATH = os.path.join(BASE_DIR, "models", "text_models", "vigilai_v4_model (1)")
+YOUTUBE_TEXT_MODEL_PATH = os.path.join(MODELS_ROOT, "text_models", "vigilai_v4_model (1)")
 
 # Text-only detector — used by /predict and /predict_batch.
-TEXT_ONLY_MODEL_PATH = os.path.join(BASE_DIR, "models", "text_models", "vigilai_v6_model")
+TEXT_ONLY_MODEL_PATH = os.path.join(MODELS_ROOT, "text_models", "vigilai_v6_model")
 
 # ── Sarvam AI API key (loaded from .env — see _load_dotenv() above) ────
 SARVAM_API_KEY = os.environ.get("SARVAM_API_KEY", "")
