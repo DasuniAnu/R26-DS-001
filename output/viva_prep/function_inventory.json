@@ -1,0 +1,478 @@
+[
+  {
+    "file": "backend/app.py",
+    "name": "_fuse_youtube_hate_predictions",
+    "qualified": "_fuse_youtube_hate_predictions",
+    "line": 46,
+    "end": 80,
+    "decorators": []
+  },
+  {
+    "file": "backend/app.py",
+    "name": "_is_usable_sinhala_transcript",
+    "qualified": "_is_usable_sinhala_transcript",
+    "line": 83,
+    "end": 89,
+    "decorators": []
+  },
+  {
+    "file": "backend/app.py",
+    "name": "health",
+    "qualified": "health",
+    "line": 93,
+    "end": 104,
+    "decorators": [
+      "app.route('/api/health', methods=['GET'])"
+    ]
+  },
+  {
+    "file": "backend/app.py",
+    "name": "text_predict",
+    "qualified": "text_predict",
+    "line": 108,
+    "end": 127,
+    "decorators": [
+      "app.route('/api/text/predict', methods=['POST'])"
+    ]
+  },
+  {
+    "file": "backend/app.py",
+    "name": "audio_predict",
+    "qualified": "audio_predict",
+    "line": 131,
+    "end": 168,
+    "decorators": [
+      "app.route('/api/audio/predict', methods=['POST'])"
+    ]
+  },
+  {
+    "file": "backend/app.py",
+    "name": "youtube_analyze",
+    "qualified": "youtube_analyze",
+    "line": 173,
+    "end": 283,
+    "decorators": [
+      "app.route('/api/youtube/analyze', methods=['POST'])"
+    ]
+  },
+  {
+    "file": "backend/app.py",
+    "name": "youtube_metadata",
+    "qualified": "youtube_metadata",
+    "line": 287,
+    "end": 298,
+    "decorators": [
+      "app.route('/api/youtube/metadata', methods=['POST'])"
+    ]
+  },
+  {
+    "file": "backend/app.py",
+    "name": "youtube_comments",
+    "qualified": "youtube_comments",
+    "line": 302,
+    "end": 363,
+    "decorators": [
+      "app.route('/api/youtube/comments', methods=['POST'])"
+    ]
+  },
+  {
+    "file": "backend/preprocessing.py",
+    "name": "clean_text",
+    "qualified": "clean_text",
+    "line": 134,
+    "end": 147,
+    "decorators": []
+  },
+  {
+    "file": "backend/preprocessing.py",
+    "name": "clean_noise",
+    "qualified": "clean_noise",
+    "line": 154,
+    "end": 159,
+    "decorators": []
+  },
+  {
+    "file": "backend/preprocessing.py",
+    "name": "is_romanized",
+    "qualified": "is_romanized",
+    "line": 166,
+    "end": 176,
+    "decorators": []
+  },
+  {
+    "file": "backend/preprocessing.py",
+    "name": "convert_hate_words",
+    "qualified": "convert_hate_words",
+    "line": 183,
+    "end": 215,
+    "decorators": []
+  },
+  {
+    "file": "backend/preprocessing.py",
+    "name": "preprocess",
+    "qualified": "preprocess",
+    "line": 223,
+    "end": 251,
+    "decorators": []
+  },
+  {
+    "file": "backend/audio_utils.py",
+    "name": "load_audio",
+    "qualified": "load_audio",
+    "line": 18,
+    "end": 47,
+    "decorators": []
+  },
+  {
+    "file": "backend/model_manager.py",
+    "name": "_load_text_model",
+    "qualified": "_load_text_model",
+    "line": 42,
+    "end": 62,
+    "decorators": []
+  },
+  {
+    "file": "backend/model_manager.py",
+    "name": "_load_audio_hate_model",
+    "qualified": "_load_audio_hate_model",
+    "line": 65,
+    "end": 81,
+    "decorators": []
+  },
+  {
+    "file": "backend/model_manager.py",
+    "name": "_load_audio_fake_model",
+    "qualified": "_load_audio_fake_model",
+    "line": 84,
+    "end": 106,
+    "decorators": []
+  },
+  {
+    "file": "backend/model_manager.py",
+    "name": "_deepfake_label_indices",
+    "qualified": "_deepfake_label_indices",
+    "line": 109,
+    "end": 112,
+    "decorators": []
+  },
+  {
+    "file": "backend/model_manager.py",
+    "name": "_compute_audio_features",
+    "qualified": "_compute_audio_features",
+    "line": 119,
+    "end": 143,
+    "decorators": []
+  },
+  {
+    "file": "backend/model_manager.py",
+    "name": "_generate_explanations",
+    "qualified": "_generate_explanations",
+    "line": 146,
+    "end": 236,
+    "decorators": []
+  },
+  {
+    "file": "backend/model_manager.py",
+    "name": "predict_text",
+    "qualified": "predict_text",
+    "line": 243,
+    "end": 297,
+    "decorators": []
+  },
+  {
+    "file": "backend/model_manager.py",
+    "name": "predict_text_batch",
+    "qualified": "predict_text_batch",
+    "line": 300,
+    "end": 353,
+    "decorators": []
+  },
+  {
+    "file": "backend/model_manager.py",
+    "name": "predict_audio",
+    "qualified": "predict_audio",
+    "line": 356,
+    "end": 432,
+    "decorators": []
+  },
+  {
+    "file": "backend/model_manager.py",
+    "name": "predict_audio_array",
+    "qualified": "predict_audio_array",
+    "line": 435,
+    "end": 522,
+    "decorators": []
+  },
+  {
+    "file": "backend/youtube_utils.py",
+    "name": "format_time",
+    "qualified": "format_time",
+    "line": 25,
+    "end": 28,
+    "decorators": []
+  },
+  {
+    "file": "backend/youtube_utils.py",
+    "name": "get_video_id",
+    "qualified": "get_video_id",
+    "line": 30,
+    "end": 49,
+    "decorators": []
+  },
+  {
+    "file": "backend/youtube_utils.py",
+    "name": "get_video_metadata",
+    "qualified": "get_video_metadata",
+    "line": 51,
+    "end": 64,
+    "decorators": []
+  },
+  {
+    "file": "backend/youtube_utils.py",
+    "name": "download_youtube_audio",
+    "qualified": "download_youtube_audio",
+    "line": 66,
+    "end": 98,
+    "decorators": []
+  },
+  {
+    "file": "backend/youtube_utils.py",
+    "name": "_load_vad",
+    "qualified": "_load_vad",
+    "line": 105,
+    "end": 114,
+    "decorators": []
+  },
+  {
+    "file": "backend/youtube_utils.py",
+    "name": "analyze_youtube_video",
+    "qualified": "analyze_youtube_video",
+    "line": 116,
+    "end": 201,
+    "decorators": []
+  },
+  {
+    "file": "backend/youtube_utils.py",
+    "name": "_normalise_comments",
+    "qualified": "_normalise_comments",
+    "line": 203,
+    "end": 217,
+    "decorators": []
+  },
+  {
+    "file": "backend/youtube_utils.py",
+    "name": "_fetch_comments_from_api",
+    "qualified": "_fetch_comments_from_api",
+    "line": 220,
+    "end": 263,
+    "decorators": []
+  },
+  {
+    "file": "backend/youtube_utils.py",
+    "name": "fetch_youtube_comments",
+    "qualified": "fetch_youtube_comments",
+    "line": 266,
+    "end": 312,
+    "decorators": []
+  },
+  {
+    "file": "backend/asr_manager.py",
+    "name": "_load_model",
+    "qualified": "_load_model",
+    "line": 24,
+    "end": 42,
+    "decorators": []
+  },
+  {
+    "file": "backend/asr_manager.py",
+    "name": "decode_segment",
+    "qualified": "decode_segment",
+    "line": 45,
+    "end": 79,
+    "decorators": []
+  },
+  {
+    "file": "backend/asr_manager.py",
+    "name": "transcribe_sinhala_audio",
+    "qualified": "transcribe_sinhala_audio",
+    "line": 82,
+    "end": 116,
+    "decorators": []
+  },
+  {
+    "file": "backend/test_asr.py",
+    "name": "decode",
+    "qualified": "Tokenizer.decode",
+    "line": 15,
+    "end": 17,
+    "decorators": []
+  },
+  {
+    "file": "backend/test_asr.py",
+    "name": "decode",
+    "qualified": "RecognitionTests.decode",
+    "line": 21,
+    "end": 25,
+    "decorators": []
+  },
+  {
+    "file": "backend/test_asr.py",
+    "name": "test_context_is_excluded_and_repeated_letters_survive",
+    "qualified": "RecognitionTests.test_context_is_excluded_and_repeated_letters_survive",
+    "line": 27,
+    "end": 30,
+    "decorators": []
+  },
+  {
+    "file": "backend/test_asr.py",
+    "name": "test_boundary_run_is_assigned_once",
+    "qualified": "RecognitionTests.test_boundary_run_is_assigned_once",
+    "line": 32,
+    "end": 36,
+    "decorators": []
+  },
+  {
+    "file": "backend/test_asr.py",
+    "name": "test_low_scores_and_blank_only_need_review",
+    "qualified": "RecognitionTests.test_low_scores_and_blank_only_need_review",
+    "line": 38,
+    "end": 40,
+    "decorators": []
+  },
+  {
+    "file": "backend/test_asr.py",
+    "name": "test_blank_frames_do_not_inflate_score",
+    "qualified": "RecognitionTests.test_blank_frames_do_not_inflate_score",
+    "line": 42,
+    "end": 48,
+    "decorators": []
+  },
+  {
+    "file": "backend/test_asr.py",
+    "name": "test_silence_and_nonfinite_input_do_not_load_model",
+    "qualified": "RecognitionTests.test_silence_and_nonfinite_input_do_not_load_model",
+    "line": 50,
+    "end": 54,
+    "decorators": []
+  },
+  {
+    "file": "backend/test_asr.py",
+    "name": "test_context_and_original_deepfake_audio_are_separate",
+    "qualified": "RecognitionTests.test_context_and_original_deepfake_audio_are_separate",
+    "line": 56,
+    "end": 72,
+    "decorators": []
+  },
+  {
+    "file": "backend/test_asr.py",
+    "name": "request",
+    "qualified": "RecognitionTests.request",
+    "line": 74,
+    "end": 85,
+    "decorators": []
+  },
+  {
+    "file": "backend/test_asr.py",
+    "name": "test_uncertain_transcript_does_not_classify_or_count_clean",
+    "qualified": "RecognitionTests.test_uncertain_transcript_does_not_classify_or_count_clean",
+    "line": 87,
+    "end": 93,
+    "decorators": []
+  },
+  {
+    "file": "backend/test_asr.py",
+    "name": "test_accepted_transcript_still_contributes",
+    "qualified": "RecognitionTests.test_accepted_transcript_still_contributes",
+    "line": 95,
+    "end": 99,
+    "decorators": []
+  },
+  {
+    "file": "backend/test_asr.py",
+    "name": "test_asr_failure_keeps_audio_result",
+    "qualified": "RecognitionTests.test_asr_failure_keeps_audio_result",
+    "line": 101,
+    "end": 105,
+    "decorators": []
+  },
+  {
+    "file": "backend/test_asr.py",
+    "name": "test_no_speech_skips_asr",
+    "qualified": "RecognitionTests.test_no_speech_skips_asr",
+    "line": 107,
+    "end": 111,
+    "decorators": []
+  },
+  {
+    "file": "frontend/app.py",
+    "name": "cbar",
+    "qualified": "cbar",
+    "line": 57,
+    "end": 58,
+    "decorators": []
+  },
+  {
+    "file": "frontend/app.py",
+    "name": "build_youtube_pdf_report",
+    "qualified": "build_youtube_pdf_report",
+    "line": 61,
+    "end": 215,
+    "decorators": []
+  },
+  {
+    "file": "frontend/app.py",
+    "name": "text",
+    "qualified": "build_youtube_pdf_report.text",
+    "line": 109,
+    "end": 110,
+    "decorators": []
+  },
+  {
+    "file": "frontend/app.py",
+    "name": "section",
+    "qualified": "build_youtube_pdf_report.section",
+    "line": 112,
+    "end": 113,
+    "decorators": []
+  },
+  {
+    "file": "frontend/app.py",
+    "name": "metric_card",
+    "qualified": "build_youtube_pdf_report.metric_card",
+    "line": 115,
+    "end": 121,
+    "decorators": []
+  },
+  {
+    "file": "frontend/app.py",
+    "name": "page_decor",
+    "qualified": "build_youtube_pdf_report.page_decor",
+    "line": 123,
+    "end": 131,
+    "decorators": []
+  },
+  {
+    "file": "frontend/app.py",
+    "name": "build_youtube_html_report",
+    "qualified": "build_youtube_html_report",
+    "line": 218,
+    "end": 277,
+    "decorators": []
+  },
+  {
+    "file": "frontend/app.py",
+    "name": "value",
+    "qualified": "build_youtube_html_report.value",
+    "line": 220,
+    "end": 221,
+    "decorators": []
+  },
+  {
+    "file": "frontend/app.py",
+    "name": "render_comment_card",
+    "qualified": "render_comment_card",
+    "line": 461,
+    "end": 479,
+    "decorators": []
+  }
+]

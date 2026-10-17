@@ -1,0 +1,87 @@
+[
+  {
+    "path": "backend/app.py",
+    "sha256": "cc8e223733a320a5509a4ca141521abe27eed14863fc52baff67fc8e96940900",
+    "lines": 372
+  },
+  {
+    "path": "backend/preprocessing.py",
+    "sha256": "d159ad31eb47b8faca7e4cdbb329f2fac66a27882ebb379945133b50651cd5a7",
+    "lines": 251
+  },
+  {
+    "path": "backend/audio_utils.py",
+    "sha256": "38d40cf5aaf698fac85e06bc59517006c7d56682ede1d117829b0235304e9fe0",
+    "lines": 47
+  },
+  {
+    "path": "backend/model_manager.py",
+    "sha256": "71eee46b68f21a4ed6194782b1d2f158335811966a6a5f55ddafe7b697592ac9",
+    "lines": 522
+  },
+  {
+    "path": "backend/youtube_utils.py",
+    "sha256": "8917baa03be763069627e6406e27392e9047dfd3c131efa09effcbf235e200c5",
+    "lines": 312
+  },
+  {
+    "path": "backend/asr_manager.py",
+    "sha256": "8356b8bf72eb242be89d2f4111a7801cb70ac3bf21c672c6e4d3758d1c5b4828",
+    "lines": 116
+  },
+  {
+    "path": "backend/test_asr.py",
+    "sha256": "557d4b6e9c7d0cf4eb046e0cb1a321afe464aa8c68392d38637d5b743ced9776",
+    "lines": 115
+  },
+  {
+    "path": "backend/ASR_NOTES.md",
+    "sha256": "bfb017589195918d310814084bcb56ead6489268d320bd491acd3eadb0c39340",
+    "lines": 33
+  },
+  {
+    "path": "backend/requirements.txt",
+    "sha256": "7604404c969078ca3752592f28d4bc007df46e44f0700e7e0c4340f811e860f2",
+    "lines": 9
+  },
+  {
+    "path": "frontend/app.py",
+    "sha256": "ea0acbbd87c2c6df1ed1f616fc7a710d10407cab86b2711bc7d62642e77c71ef",
+    "lines": 756
+  },
+  {
+    "path": "frontend/requirements.txt",
+    "sha256": "a729f288cc1342ca11452d7310a16f4f0e6c716f1b574d90c07eb3f11e9a13b5",
+    "lines": 3
+  },
+  {
+    "path": "frontend/.streamlit/config.toml",
+    "sha256": "1bd09d0eff7e74029e0af13586a188a672b84124c5d5da6fc076e0617936139e",
+    "lines": 11
+  },
+  {
+    "path": "models/model_audio_hatespeech/config.json",
+    "sha256": "3282430316200f1ddb9b574bb3ab78dc2895e1d60031f9ac3be452eb24b868c9",
+    "lines": 126
+  },
+  {
+    "path": "models/model_audio_hatespeech/processor_config.json",
+    "sha256": "ef6249defef0d39229fa82906cb3e28c80fddc34d19d32555087bde53572145c",
+    "lines": 12
+  },
+  {
+    "path": "models/model_audio_deepfake/config.json",
+    "sha256": "a2d0998bbf60c37eb5c505d61b7f211434d142e0e7549a1d1ddd19163af6db2d",
+    "lines": 129
+  },
+  {
+    "path": "models/model_audio_deepfake/preprocessor_config.json",
+    "sha256": "99272fe8ccfab114b68b478681ea47ee3a1ce62bb788cb92dd6e4f69fb1f1da2",
+    "lines": 9
+  },
+  {
+    "path": "models/model_text_hatespeech/text_model_zip/config.json",
+    "sha256": "6a6ac8d538189a20a13ac78d7837a1e53e5f6f5ce52ea749785641f0f5e4ea0e",
+    "lines": 31
+  }
+]
