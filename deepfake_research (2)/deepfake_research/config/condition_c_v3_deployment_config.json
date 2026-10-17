@@ -1,0 +1,11 @@
+{
+    "window_seconds": 2.0,
+    "window_stride_seconds": 1.0,
+    "frames_per_window": 15,
+    "image_size": 224,
+    "minimum_detected_faces": 8,
+    "mtcnn_confidence": 0.8,
+    "window_fake_threshold": 0.60,
+    "minimum_consecutive_fake_windows": 4,
+    "full_fake_coverage_threshold": 0.3
+}

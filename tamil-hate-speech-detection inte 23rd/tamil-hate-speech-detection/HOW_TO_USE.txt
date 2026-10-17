@@ -1,0 +1,69 @@
+═══════════════════════════════════════════════════════
+TAMIL HATE SPEECH DETECTION — HOW TO USE THIS PROJECT
+Anutthara S.A.D | IT22217554 | SLIIT
+═══════════════════════════════════════════════════════
+
+STEP 1 — ADD YOUR DOWNLOADED FILES TO CORRECT FOLDERS
+═══════════════════════════════════════════════════════
+
+models/audio_models/
+  ✅ audio_svm.pkl        ← copy here from Downloads
+  ✅ audio_scaler.pkl     ← copy here from Downloads  
+  ✅ audio_dnn.pt         ← copy here from Downloads
+
+models/text_models/xlmr_saved/
+  ✅ config.json          ← unzip xlmr_saved.zip here
+  ✅ model.safetensors    ← unzip xlmr_saved.zip here
+  ✅ tokenizer files      ← unzip xlmr_saved.zip here
+
+models/fusion_models/
+  ⏳ fusion_model_f1.pt   ← download after fusion training
+  ⏳ fusion_scaler.pkl    ← download after fusion training
+
+data/text/
+  ✅ train_clean.csv      ← copy here from Downloads
+  ✅ dev_clean.csv        ← copy here from Downloads
+  ✅ test_clean.csv       ← copy here from Downloads
+
+data/audio/
+  ✅ final_audio_labels.csv    ← copy here from Downloads
+  ✅ audio_features_all.csv    ← copy here from Downloads
+
+notebooks/
+  ✅ research-notebook-dasuni.ipynb ← copy here from Downloads
+
+
+STEP 2 — INSTALL PYTHON LIBRARIES
+═══════════════════════════════════
+Open VS Code terminal and run:
+  pip install -r requirements.txt
+
+
+STEP 3 — RUN THE DEMO
+══════════════════════
+Open TWO terminals in VS Code:
+
+Terminal 1:
+  python api/app.py
+
+Terminal 2:
+  streamlit run demo/streamlit_app.py
+
+Then open browser at: http://localhost:8501
+
+
+STEP 4 — PUSH TO GITHUB
+═════════════════════════
+git init
+git add .
+git commit -m "PP1 Tamil hate speech detection"
+git remote add origin https://github.com/YOUR-USERNAME/tamil-hate-speech-detection.git
+git push -u origin main
+
+NOTE: Model files are in .gitignore (too large for GitHub)
+Upload xlmr_saved.zip to Google Drive and add link to README.md
+
+
+═══════════════════════════════════════════════════════
+CONTACT: IT22217554@my.sliit.lk
+═══════════════════════════════════════════════════════

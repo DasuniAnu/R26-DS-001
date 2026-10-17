@@ -1,0 +1,34 @@
+Sinhala YouTube Content Match Dataset Quality Report
+
+total samples: 10000
+MATCH label 0 samples: 5000
+MISMATCH label 1 samples: 5000
+exact duplicate rows: 0
+duplicate titles: 0
+duplicate transcripts: 0
+near duplicate transcript pairs in first 1200 rows at cosine >= 0.96: 0
+
+missing values:
+- video_id: 0
+- title: 0
+- description: 0
+- transcript: 0
+- label: 0
+
+average transcript word length per class:
+- label 0: 296.5
+- label 1: 296.5
+
+topic distribution by label:
+- label 0: {'AI': 179, 'Agriculture': 179, 'Business': 179, 'Celebrity news': 179, 'Cricket': 178, 'Crime': 178, 'Economics': 179, 'Education': 179, 'Entertainment': 179, 'Finance': 179, 'Food': 179, 'Government': 178, 'Health': 179, 'History': 178, 'Jobs': 178, 'Lifestyle': 178, 'Mobile phones': 178, 'Politics': 178, 'Religion': 178, 'Science': 179, 'Social media': 178, 'Sports': 179, 'Sri Lankan news': 179, 'Technology': 179, 'Travel': 179, 'University': 178, 'Vehicles': 178, 'Weather': 179}
+- label 1: {'AI': 178, 'Agriculture': 178, 'Business': 179, 'Celebrity news': 178, 'Cricket': 179, 'Crime': 179, 'Economics': 179, 'Education': 178, 'Entertainment': 178, 'Finance': 179, 'Food': 178, 'Government': 179, 'Health': 178, 'History': 179, 'Jobs': 179, 'Lifestyle': 179, 'Mobile phones': 179, 'Politics': 179, 'Religion': 179, 'Science': 178, 'Social media': 179, 'Sports': 178, 'Sri Lankan news': 179, 'Technology': 178, 'Travel': 178, 'University': 179, 'Vehicles': 179, 'Weather': 178}
+
+label leakage term hits in transcript:
+- mismatch: 0
+- matching: 0
+- unrelated content: 0
+- label: 0
+- false: 0
+
+generation problems found:
+- none

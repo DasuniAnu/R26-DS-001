@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Detector Test - Sinhala False Content</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <!-- Page-scoped dark theme, matching the Tamil/Sinhala/Deepfake pages'
+         look inside the unified Shell. Added only to this template — the
+         shared styles.css (used by this app's other, non-embedded pages:
+         index.html, audio.html, etc.) is completely untouched, so nothing
+         about this project's standalone behavior changes. Only colors and
+         rounding are overridden here; no markup, form, or script logic. -->
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0d1538;
+        --surface: #131a3f;
+        --ink: #e2e8f0;
+        --muted: #94a3b8;
+        --line: #2d3561;
+        --accent: #6366f1;
+        --accent-strong: #4f46e5;
+        --danger: #f87171;
+        --ok: #34d399;
+        --shadow: 0 18px 45px rgba(0, 0, 0, 0.45);
+      }
+      body {
+        background: linear-gradient(135deg, #0a0e27 0%, #0d1538 30%, #111d4a 60%, #0a1230 100%);
+      }
+      button {
+        background: linear-gradient(135deg, #4f46e5, #6366f1, #7c3aed);
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+      }
+      button:hover {
+        background: linear-gradient(135deg, #4338ca, #4f46e5, #6d28d9);
+        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.45);
+      }
+      /* These had a hardcoded white background in the original stylesheet
+         (not the --surface variable), which the dark theme above would
+         otherwise leave stranded as light boxes with now-light text. */
+      .workflow-step, select, .secondary-button, .candidate-item, .note-chip {
+        background: var(--surface) !important;
+      }
+      .secondary-button:hover { background: #1b2350 !important; }
+      .error { background: rgba(248, 113, 113, 0.1) !important; }
+    </style>
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace" aria-labelledby="page-title">
+        <header class="topbar">
+          <div class="brand">
+            <img src="{{ url_for('static', filename='mark.svg') }}" alt="" class="brand-mark">
+            <div>
+              <h1 id="page-title">Binary Detector Test</h1>
+              <p>YouTube Data API v3 to False vs Not False detection.</p>
+            </div>
+          </div>
+          <div class="status-pills" aria-label="Available model artifacts">
+            <span class="pill {{ 'ready' if models.text else 'missing' }}">Text</span>
+            <span class="pill {{ 'ready' if models.multimodal else 'missing' }}">Multimodal</span>
+          </div>
+        </header>
+
+        <div class="content-grid tester-grid">
+          <form class="prediction-form tester-form" id="test-form">
+            <section class="flow-step">
+              <span class="step-label">YouTube Data API v3</span>
+              <div class="url-row">
+                <label class="grow-field">
+                  <span>YouTube URL</span>
+                  <input id="youtube-url" name="url" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off">
+                </label>
+                <button type="button" id="load-youtube-button">Load</button>
+              </div>
+              <div class="message {{ '' if youtube_api_key_loaded else 'error' }}" id="api-status">
+                <span class="message-label">API Status</span>
+                <p>{{ 'YOUTUBE_API_KEY loaded. Metadata will be fetched through YouTube Data API v3. Transcript is optional and may be empty when captions are unavailable.' if youtube_api_key_loaded else 'YOUTUBE_API_KEY is missing. Add it to .env and restart Flask to use YouTube Data API v3.' }}</p>
+              </div>
+            </section>
+
+            <fieldset>
+              <legend>Model</legend>
+              <div class="segmented-control">
+                <label>
+                  <input type="radio" name="model_type" value="text" checked>
+                  <span>Text</span>
+                </label>
+                <label>
+                  <input type="radio" name="model_type" value="multimodal" {{ 'disabled' if not models.multimodal else '' }}>
+                  <span>Multimodal</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <label>
+              <span>Title</span>
+              <input id="title" name="title" autocomplete="off">
+            </label>
+
+            <label>
+              <span>Description</span>
+              <textarea id="description" name="description" rows="4"></textarea>
+            </label>
+
+            <label>
+              <span>Transcript</span>
+              <textarea id="transcript" name="transcript" rows="8"></textarea>
+            </label>
+
+            <div class="message" id="transcript-status">
+              <span class="message-label">Transcript Status</span>
+              <p>Load a YouTube URL to check captions, or enter transcript manually.</p>
+            </div>
+
+            <section class="thumbnail-review">
+              <span class="step-label">Thumbnail</span>
+              <div class="thumbnail-review-grid">
+                <label>
+                  <span>Thumbnail URL</span>
+                  <input id="thumbnail-url" name="thumbnail_url" autocomplete="off">
+                </label>
+                <div class="thumbnail-preview" id="thumbnail-preview">
+                  <span>No thumbnail loaded</span>
+                </div>
+              </div>
+            </section>
+
+            <div class="tester-actions">
+              <button type="submit" id="analyze-button">Analyze</button>
+              <button type="button" class="secondary-button" id="generate-transcript-button">Generate Transcript</button>
+              <button type="button" class="secondary-button" id="analyze-without-transcript-button">Analyze Without Transcript</button>
+              <button type="button" class="secondary-button" id="sample-button">Sample</button>
+              <button type="button" class="secondary-button" id="placeholder-button">Placeholder</button>
+              <button type="button" class="secondary-button" id="clear-button">Clear</button>
+            </div>
+          </form>
+
+          <aside class="result-panel tester-result" aria-live="polite">
+            <div class="empty-state compact-empty" id="empty-state">
+              <div class="signal-bars" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <p>Load a YouTube URL or enter fields manually.</p>
+            </div>
+
+            <div class="message error" id="error-panel" hidden>
+              <span class="message-label">Error</span>
+              <p id="error-text"></p>
+            </div>
+
+            <div class="score-card" id="result-card" hidden>
+              <span class="message-label" id="model-label">Prediction</span>
+              <strong id="result-label"></strong>
+              <div class="meter" aria-label="Confidence">
+                <span id="confidence-meter"></span>
+              </div>
+              <p id="confidence-text"></p>
+            </div>
+
+            <div class="probability-card" id="probability-card" hidden>
+              <span class="message-label">Probabilities</span>
+              <div id="probability-list"></div>
+            </div>
+
+            <div class="message" id="review-panel" hidden>
+              <span class="message-label">Review</span>
+              <p id="review-text"></p>
+            </div>
+
+            <div class="message" id="evidence-panel" hidden>
+              <span class="message-label">Evidence Signals</span>
+              <p id="evidence-text"></p>
+            </div>
+
+            <div class="message" id="warnings-panel" hidden>
+              <span class="message-label">Warnings</span>
+              <p id="warnings-text"></p>
+            </div>
+
+            <div class="api-panel" id="json-panel" hidden>
+              <h2>JSON</h2>
+              <pre id="json-output"></pre>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const form = document.getElementById("test-form");
+      const youtubeUrlInput = document.getElementById("youtube-url");
+      const loadYouTubeButton = document.getElementById("load-youtube-button");
+      const apiStatus = document.getElementById("api-status");
+      const titleInput = document.getElementById("title");
+      const descriptionInput = document.getElementById("description");
+      const transcriptInput = document.getElementById("transcript");
+      const transcriptStatus = document.getElementById("transcript-status");
+      const thumbnailInput = document.getElementById("thumbnail-url");
+      const thumbnailPreview = document.getElementById("thumbnail-preview");
+      const analyzeButton = document.getElementById("analyze-button");
+      const generateTranscriptButton = document.getElementById("generate-transcript-button");
+      const analyzeWithoutTranscriptButton = document.getElementById("analyze-without-transcript-button");
+      const sampleButton = document.getElementById("sample-button");
+      const placeholderButton = document.getElementById("placeholder-button");
+      const clearButton = document.getElementById("clear-button");
+      const emptyState = document.getElementById("empty-state");
+      const errorPanel = document.getElementById("error-panel");
+      const errorText = document.getElementById("error-text");
+      const resultCard = document.getElementById("result-card");
+      const modelLabel = document.getElementById("model-label");
+      const resultLabel = document.getElementById("result-label");
+      const confidenceMeter = document.getElementById("confidence-meter");
+      const confidenceText = document.getElementById("confidence-text");
+      const probabilityCard = document.getElementById("probability-card");
+      const probabilityList = document.getElementById("probability-list");
+      const reviewPanel = document.getElementById("review-panel");
+      const reviewText = document.getElementById("review-text");
+      const evidencePanel = document.getElementById("evidence-panel");
+      const evidenceText = document.getElementById("evidence-text");
+      const warningsPanel = document.getElementById("warnings-panel");
+      const warningsText = document.getElementById("warnings-text");
+      const jsonPanel = document.getElementById("json-panel");
+      const jsonOutput = document.getElementById("json-output");
+      const classOrder = ["False", "Not False"];
+      let loadedVideoId = "";
+      let allowAnalyzeWithoutTranscript = false;
+
+      function percent(value) {
+        return `${(Number(value || 0) * 100).toFixed(1)}%`;
+      }
+
+      function selectedModel() {
+        const checked = form.querySelector("input[name='model_type']:checked");
+        return checked ? checked.value : "text";
+      }
+
+      function setApiStatus(message, isError = false) {
+        apiStatus.className = isError ? "message error" : "message";
+        apiStatus.querySelector("p").textContent = message;
+      }
+
+      function setTranscriptStatus(message, isError = false) {
+        transcriptStatus.className = isError ? "message error" : "message";
+        transcriptStatus.querySelector("p").textContent = message;
+      }
+
+      function startTranscriptProgress(panel) {
+        const steps = [
+          "Downloading YouTube audio...",
+          "Preparing compressed audio...",
+          "Loading Sinhala ASR model...",
+          "Generating Sinhala transcript...",
+          "Finalizing transcript..."
+        ];
+        const startedAt = Date.now();
+        let index = 0;
+        panel.className = "message";
+        panel.querySelector("p").innerHTML = `
+          <span>${steps[0]}</span>
+          <span class="progress-note">
+            <span class="progress-track"><span style="width: 8%"></span></span>
+            <small>Elapsed: 0s. Long videos can take several minutes.</small>
+          </span>
+        `;
+        return window.setInterval(() => {
+          index = Math.min(index + 1, steps.length - 1);
+          const elapsed = Math.max(1, Math.round((Date.now() - startedAt) / 1000));
+          const width = Math.min(92, 8 + elapsed * 4);
+          panel.querySelector("p").innerHTML = `
+            <span>${steps[index]}</span>
+            <span class="progress-note">
+              <span class="progress-track"><span style="width: ${width}%"></span></span>
+              <small>Elapsed: ${elapsed}s. Long videos can take several minutes.</small>
+            </span>
+          `;
+        }, 5000);
+      }
+
+      function stopTranscriptProgress(timer) {
+        if (timer) window.clearInterval(timer);
+      }
+
+      function setThumbnailPreview(url) {
+        const cleanUrl = String(url || "").trim();
+        thumbnailPreview.innerHTML = "";
+        if (!cleanUrl) {
+          const placeholder = document.createElement("span");
+          placeholder.textContent = "No thumbnail loaded";
+          thumbnailPreview.appendChild(placeholder);
+          return;
+        }
+
+        const image = document.createElement("img");
+        image.src = cleanUrl;
+        image.alt = "YouTube thumbnail";
+        image.onerror = () => {
+          thumbnailPreview.innerHTML = "<span>Thumbnail could not be loaded</span>";
+        };
+        thumbnailPreview.appendChild(image);
+      }
+
+      function hidePanels() {
+        emptyState.hidden = true;
+        errorPanel.hidden = true;
+        resultCard.hidden = true;
+        probabilityCard.hidden = true;
+        reviewPanel.hidden = true;
+        evidencePanel.hidden = true;
+        warningsPanel.hidden = true;
+        jsonPanel.hidden = true;
+      }
+
+      function showError(message, payload = null) {
+        hidePanels();
+        errorPanel.hidden = false;
+        errorText.textContent = message;
+        if (payload) {
+          jsonPanel.hidden = false;
+          jsonOutput.textContent = JSON.stringify(payload, null, 2);
+        }
+      }
+
+      function renderProbabilities(probabilities) {
+        probabilityList.innerHTML = "";
+        classOrder.forEach((label) => {
+          const value = Number(probabilities[label] || 0);
+          const row = document.createElement("div");
+          row.className = "probability-row tester-probability-row";
+          row.innerHTML = `
+            <span>${label}</span>
+            <div class="probability-bar"><span style="width: ${percent(value)}"></span></div>
+            <strong>${percent(value)}</strong>
+          `;
+          probabilityList.appendChild(row);
+        });
+      }
+
+      function showResult(data) {
+        hidePanels();
+        const label = String(data.label || data.predicted_label || "Unknown");
+        const confidence = Number(data.confidence || 0);
+        resultCard.hidden = false;
+        probabilityCard.hidden = false;
+        reviewPanel.hidden = false;
+        evidencePanel.hidden = false;
+        warningsPanel.hidden = !(data.warnings || []).length;
+        jsonPanel.hidden = false;
+
+        resultCard.className = `score-card label-${label.toLowerCase().replace(/\s+/g, "-")}`;
+        modelLabel.textContent = `${data.model_type || selectedModel()} model`;
+        resultLabel.textContent = label;
+        confidenceMeter.style.width = percent(confidence);
+        confidenceText.textContent = `${percent(confidence)} confidence`;
+        renderProbabilities(data.class_probabilities || {});
+        reviewText.textContent = data.review_recommendation || "review_optional";
+        evidenceText.textContent = (data.evidence_signals || [])
+          .map((signal) => `${signal.name}=${signal.status}`)
+          .join("; ") || "none";
+        warningsText.textContent = (data.warnings || []).join(" ");
+        jsonOutput.textContent = JSON.stringify(data, null, 2);
+      }
+
+      async function loadYouTubeData() {
+        const url = youtubeUrlInput.value.trim();
+        if (!url) {
+          showError("Paste a YouTube URL before loading data.");
+          return;
+        }
+
+        loadYouTubeButton.disabled = true;
+        loadYouTubeButton.textContent = "Loading...";
+        setApiStatus("Loading metadata through YouTube Data API v3...");
+
+        try {
+          const response = await fetch("/api/youtube-metadata", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              url,
+              require_youtube_api: true,
+              use_audio_fallback: false,
+              page_data: {}
+            })
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            showError(data.error || "Could not load YouTube Data API v3 metadata.", data);
+            setApiStatus(data.error || "Could not load YouTube Data API v3 metadata.", true);
+            return;
+          }
+
+          loadedVideoId = data.video_id || "";
+          titleInput.value = data.title || "";
+          descriptionInput.value = data.description || "";
+          transcriptInput.value = data.transcript || "";
+          thumbnailInput.value = data.thumbnail_url || "";
+          setThumbnailPreview(data.thumbnail_url);
+          allowAnalyzeWithoutTranscript = Boolean(data.transcript);
+          const loadedTranscriptStatus = data.transcript ? "transcript loaded" : "no transcript captions found";
+          setApiStatus(`Loaded video ${loadedVideoId || ""} through YouTube Data API v3; ${loadedTranscriptStatus}.`);
+          setTranscriptStatus(
+            data.transcript
+              ? "Public captions were loaded. Analyze can use transcript."
+              : "No public captions were found. Generate transcript with Whisper or choose Analyze Without Transcript."
+          );
+          hidePanels();
+          emptyState.hidden = false;
+          jsonPanel.hidden = false;
+          jsonOutput.textContent = JSON.stringify(data, null, 2);
+        } catch (error) {
+          showError(error.message);
+          setApiStatus(error.message, true);
+        } finally {
+          loadYouTubeButton.disabled = false;
+          loadYouTubeButton.textContent = "Load";
+        }
+      }
+
+      async function analyze(event) {
+        event.preventDefault();
+        if (!transcriptInput.value.trim() && !allowAnalyzeWithoutTranscript) {
+          showError("Transcript is empty. Click Generate Transcript or Analyze Without Transcript.");
+          return;
+        }
+        analyzeButton.disabled = true;
+        analyzeButton.textContent = "Analyzing...";
+
+        try {
+          const hasLoadedYouTube = Boolean(loadedVideoId || youtubeUrlInput.value.trim());
+          const endpoint = hasLoadedYouTube ? "/api/predict-youtube" : "/api/predict";
+          const body = hasLoadedYouTube
+            ? {
+                url: youtubeUrlInput.value,
+                video_id: loadedVideoId,
+                require_youtube_api: true,
+                use_audio_fallback: false,
+                page_data: {
+                  title: titleInput.value,
+                  description: descriptionInput.value,
+                  transcript: transcriptInput.value,
+                  thumbnail_url: thumbnailInput.value
+                }
+              }
+            : {
+                title: titleInput.value,
+                description: descriptionInput.value,
+                transcript: transcriptInput.value,
+                thumbnail: thumbnailInput.value,
+                model_type: selectedModel()
+              };
+          const response = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body)
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            showError(data.error || "Prediction failed.", data);
+            return;
+          }
+          showResult(data);
+        } catch (error) {
+          showError(error.message);
+        } finally {
+          analyzeButton.disabled = false;
+          analyzeButton.textContent = "Analyze";
+        }
+      }
+
+      async function generateTranscript() {
+        const url = youtubeUrlInput.value.trim();
+        const videoId = loadedVideoId || url;
+        if (!videoId) {
+          showError("Load or paste a YouTube URL before generating a transcript.");
+          return;
+        }
+
+        generateTranscriptButton.disabled = true;
+        generateTranscriptButton.textContent = "Generating...";
+        const progressTimer = startTranscriptProgress(transcriptStatus);
+
+        try {
+          const response = await fetch("/api/youtube-transcript-whisper", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              url,
+              video_id: loadedVideoId,
+              force_refresh: false
+            })
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            showError(data.error || (data.warnings || []).join(" ") || "Whisper transcript generation failed.", data);
+            setTranscriptStatus(data.error || (data.warnings || []).join(" ") || "Whisper transcript generation failed.", true);
+            return;
+          }
+
+          transcriptInput.value = data.transcript || "";
+          allowAnalyzeWithoutTranscript = Boolean(data.transcript);
+          setTranscriptStatus(`Whisper transcript generated with ${data.runtime || "whisper"} (${data.model_name || "model"}).`);
+          hidePanels();
+          emptyState.hidden = false;
+          jsonPanel.hidden = false;
+          jsonOutput.textContent = JSON.stringify(data, null, 2);
+        } catch (error) {
+          showError(error.message);
+          setTranscriptStatus(error.message, true);
+        } finally {
+          stopTranscriptProgress(progressTimer);
+          generateTranscriptButton.disabled = false;
+          generateTranscriptButton.textContent = "Generate Transcript";
+        }
+      }
+
+      sampleButton.addEventListener("click", () => {
+        titleInput.value = "BREAKING! government cash grant for every family starts today";
+        descriptionInput.value = "The video claims a new government grant is available, but it does not mention an official website or notice.";
+        transcriptInput.value = "This video discusses a social media claim that every family will receive money. No official source is shown in the video.";
+        thumbnailInput.value = "";
+        allowAnalyzeWithoutTranscript = true;
+        setTranscriptStatus("Sample transcript loaded.");
+        setThumbnailPreview("");
+      });
+
+      placeholderButton.addEventListener("click", () => {
+        titleInput.value = "...";
+        descriptionInput.value = "...";
+        transcriptInput.value = "...";
+        thumbnailInput.value = "";
+        allowAnalyzeWithoutTranscript = false;
+        setTranscriptStatus("Placeholder transcript is not meaningful.", true);
+        setThumbnailPreview("");
+      });
+
+      clearButton.addEventListener("click", () => {
+        youtubeUrlInput.value = "";
+        titleInput.value = "";
+        descriptionInput.value = "";
+        transcriptInput.value = "";
+        thumbnailInput.value = "";
+        loadedVideoId = "";
+        allowAnalyzeWithoutTranscript = false;
+        setTranscriptStatus("Load a YouTube URL to check captions, or enter transcript manually.");
+        setThumbnailPreview("");
+        hidePanels();
+        emptyState.hidden = false;
+      });
+
+      loadYouTubeButton.addEventListener("click", loadYouTubeData);
+      generateTranscriptButton.addEventListener("click", generateTranscript);
+      analyzeWithoutTranscriptButton.addEventListener("click", () => {
+        allowAnalyzeWithoutTranscript = true;
+        setTranscriptStatus("Analyze without transcript selected. Result will rely on title and description.");
+      });
+      transcriptInput.addEventListener("input", () => {
+        if (transcriptInput.value.trim()) {
+          allowAnalyzeWithoutTranscript = true;
+          setTranscriptStatus("Manual transcript text is present.");
+        }
+      });
+      thumbnailInput.addEventListener("input", () => setThumbnailPreview(thumbnailInput.value));
+      form.addEventListener("submit", analyze);
+    </script>
+  </body>
+</html>

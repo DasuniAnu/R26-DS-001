@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Sinhala YouTube False Content Detector",
+  "version": "0.1.0",
+  "description": "Send the current YouTube video to the local Sinhala false-content detection model.",
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": [
+    "https://www.youtube.com/*",
+    "https://youtu.be/*",
+    "http://127.0.0.1:5000/*",
+    "http://localhost:5000/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Check Sinhala false content"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/*", "https://youtu.be/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>TruthLenseAI</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <span class="brand">🛡️ TruthLenseAI</span>
+        <span class="auto-badge">⚡ Auto-checks every video</span>
+      </header>
+
+      <p id="pageStatus" class="page-status">Open a YouTube video to check it.</p>
+      <div id="videoInfo" class="video-info" hidden>
+        <div id="videoTitle" class="video-title"></div>
+      </div>
+
+      <section class="group">
+        <h2><span class="step-num">1</span> Choose what to analyze</h2>
+
+        <!-- Hate Speech Analysis: one module card, with the language choice
+             nested inside it — enabling/disabling the whole module and
+             picking Tamil vs. Sinhala are two different decisions, but they
+             read as one coherent card instead of two separate full-width
+             options. -->
+        <div class="module-card" id="hateSpeechCard">
+          <label class="module-head">
+            <input type="checkbox" id="hateSpeechEnabled" />
+            <span class="module-icon hate">🔊</span>
+            <div class="module-text">
+              <div class="module-title">Hate Speech Analysis</div>
+              <div class="module-desc">Detect hateful or offensive speech in the audio and comments.</div>
+            </div>
+          </label>
+          <div class="module-body" id="hateSpeechBody" hidden>
+            <div class="sub-label">Language (audio)</div>
+            <div class="lang-choice">
+              <label class="lang-option"><input type="radio" name="hateLang" value="tamil" /> Tamil</label>
+              <label class="lang-option"><input type="radio" name="hateLang" value="sinhala" /> Sinhala <span class="tag">+ deepfake</span></label>
+            </div>
+            <label class="sub-checkbox">
+              <input type="checkbox" id="includeComments" /> Also analyze comments
+            </label>
+          </div>
+        </div>
+
+        <div class="module-card">
+          <label class="module-head">
+            <input type="checkbox" id="falseContent" />
+            <span class="module-icon false">📰</span>
+            <div class="module-text">
+              <div class="module-title">False / Misleading Content</div>
+              <div class="module-desc">Check title, description, and spoken content for potentially false or misleading claims.</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="module-card">
+          <label class="module-head">
+            <input type="checkbox" id="videoDeepfake" />
+            <span class="module-icon deepfake">🎬</span>
+            <div class="module-text">
+              <div class="module-title">Video Deepfake Detection</div>
+              <div class="module-desc">Detect possible AI-generated or manipulated video. Downloads the full video, so this one can take several minutes.</div>
+            </div>
+          </label>
+        </div>
+      </section>
+
+      <div class="info-banner">💡 Only one audio language can be checked at a time, for best accuracy.</div>
+
+      <button id="check">Analyze Video</button>
+      <p class="est-time">Estimated time: ~1–2 minutes (longer if Video Deepfake Detection is included)</p>
+      <p id="status" class="status"></p>
+
+      <section id="results"></section>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

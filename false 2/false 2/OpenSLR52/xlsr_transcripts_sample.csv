@@ -1,0 +1,4 @@
+audio_path,predicted_transcription,reference_transcription,speaker_id,utterance_id,part
+data/part0/asr_sinhala/data/00/0000f47c22.flac,මහවැලි ගඟට ගොස් ආපසු එන ගමනේදී,මහවැලි ගඟට ගොස් ආපසු එන ගමනේදී,7ab05,0000f47c22,part0
+data/part0/asr_sinhala/data/00/000101700f.flac,උන්වහන්සේ කපාපු,උන්වහන්සේ කපාපු,44e28,000101700f,part0
+data/part0/asr_sinhala/data/00/000107b539.flac,ඒ එතනින් අවසන් නොවී,එය එතනින් අවසන් නොවී,b1a64,000107b539,part0

@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>YouTube Audio Download</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace" aria-labelledby="page-title">
+        <header class="topbar">
+          <div class="brand">
+            <img src="{{ url_for('static', filename='mark.svg') }}" alt="" class="brand-mark">
+            <div>
+              <h1 id="page-title">YouTube Audio Download</h1>
+              <p>Prepare a local WAV file for videos you are allowed to use.</p>
+            </div>
+          </div>
+          <div class="status-pills">
+            <span class="pill {{ 'ready' if audio_transcript.yt_dlp else 'missing' }}">yt-dlp</span>
+            <span class="pill {{ 'ready' if audio_transcript.ffmpeg else 'missing' }}">FFmpeg</span>
+          </div>
+        </header>
+
+        <div class="content-grid tester-grid">
+          <form class="prediction-form" id="audio-form">
+            <section class="flow-step section-block">
+              <span class="step-label">Video Source</span>
+              <div class="url-row">
+                <label class="grow-field">
+                  <span>YouTube URL</span>
+                  <input id="youtube-url" name="url" value="{{ default_url }}" autocomplete="off">
+                </label>
+                <button type="submit" id="prepare-button">Prepare</button>
+              </div>
+              <div class="message" id="audio-status">
+                <span class="message-label">Audio</span>
+                <p>Ready to prepare audio.</p>
+              </div>
+            </section>
+
+            <section class="flow-step section-block" id="download-section" hidden>
+              <span class="step-label">Download</span>
+              <div class="label-grid">
+                <label>
+                  <span>Audio Path</span>
+                  <input id="audio-path" readonly>
+                </label>
+                <label>
+                  <span>Duration Seconds</span>
+                  <input id="duration-seconds" readonly>
+                </label>
+              </div>
+              <div class="tester-actions">
+                <a class="download-button" id="download-link" href="#">Download WAV</a>
+              </div>
+            </section>
+          </form>
+
+          <aside class="result-panel" aria-live="polite">
+            <div class="message">
+              <span class="message-label">Output</span>
+              <p>The prepared file is cached in instance/youtube_audio and served as a WAV download.</p>
+            </div>
+            <div class="message">
+              <span class="message-label">Limit</span>
+              <p>Current audio preparation uses the same duration limit as the Whisper workflow.</p>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const form = document.getElementById("audio-form");
+      const urlInput = document.getElementById("youtube-url");
+      const prepareButton = document.getElementById("prepare-button");
+      const statusBox = document.getElementById("audio-status");
+      const statusText = statusBox.querySelector("p");
+      const downloadSection = document.getElementById("download-section");
+      const audioPathInput = document.getElementById("audio-path");
+      const durationInput = document.getElementById("duration-seconds");
+      const downloadLink = document.getElementById("download-link");
+
+      function setStatus(message, isError = false) {
+        statusText.textContent = message;
+        statusBox.classList.toggle("error", isError);
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        downloadSection.hidden = true;
+        prepareButton.disabled = true;
+        setStatus("Downloading and converting audio...");
+
+        try {
+          const response = await fetch("/api/youtube-audio-download", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: urlInput.value })
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(data.error || "Audio download failed.");
+          }
+
+          audioPathInput.value = data.audio_path || "";
+          durationInput.value = data.duration_seconds || "";
+          downloadLink.href = data.download_url;
+          downloadLink.download = data.filename || "youtube-audio.wav";
+          downloadSection.hidden = false;
+          setStatus(`Audio ready for ${data.video_id}.`);
+        } catch (error) {
+          setStatus(error.message, true);
+        } finally {
+          prepareButton.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>

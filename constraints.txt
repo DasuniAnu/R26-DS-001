@@ -1,0 +1,5 @@
+# Pins setuptools below the version that dropped pkg_resources (v82, early 2026).
+# openai-whisper's build still needs pkg_resources to build from source.
+# Referenced via the PIP_CONSTRAINT env var during pip install (GitHub Actions
+# workflow and Azure's Oryx build).
+setuptools<82

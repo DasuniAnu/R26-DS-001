@@ -1,0 +1,2 @@
+audio_path,transcript,split,source,duration_seconds
+data/asr/audio/example.wav,මෙහි නිවැරදිව සත්‍යාපනය කළ සිංහල පිටපත ඇතුළත් කරන්න.,train,manual,12

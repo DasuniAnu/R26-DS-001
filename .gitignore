@@ -205,3 +205,42 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# ── Added for this project's integration (large files GitHub rejects,
+# secrets, and locally-generated artifacts — none of this affects how the
+# project runs, only what gets committed) ──────────────────────────────
+
+# Python virtual environments (every sub-project has its own; reinstalled
+# from requirements.txt, never committed)
+venv/
+.venv/
+venv_py311/
+
+# Trained models and datasets — far too large for a normal git push
+# (individual files here are 300MB-1.5GB; GitHub's hard limit is 100MB/file)
+models/
+model_audio_deepfake/
+model_audio_hatespeech/
+model_text_hatespeech/
+*.safetensors
+*.onnx
+*.npy
+*.pt
+*.pkl
+dataset/
+dataset_processed/
+outputs/
+
+# Third-party tool cloned with its own separate git history — excluded
+# entirely rather than nested, to avoid confusing this repo's git
+roop/
+
+# Logs generated at runtime
+logs/
+*.log
+
+# Node modules (if any tooling ever adds them)
+node_modules/
+
+# PID files from launch scripts
+*.pid

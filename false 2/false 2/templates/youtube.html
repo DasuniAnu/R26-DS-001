@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Examiner Demo - Sinhala Detector</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace" aria-labelledby="page-title">
+        <header class="topbar">
+          <div class="brand">
+            <img src="{{ url_for('static', filename='mark.svg') }}" alt="" class="brand-mark">
+            <div>
+              <h1 id="page-title">Sinhala YouTube False Content Detector</h1>
+              <p>YouTube URL or manual input, then analyze as False or Not False.</p>
+            </div>
+          </div>
+        </header>
+
+        <div class="content-grid examiner-grid">
+          <form class="prediction-form examiner-form" id="examiner-form">
+            <section class="flow-step">
+              <span class="step-label">YouTube URL or manual input</span>
+              <div class="url-row">
+                <label class="grow-field">
+                  <span>YouTube URL</span>
+                  <input id="youtube-url" name="url" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off">
+                </label>
+                <button type="button" id="load-button">Load Details</button>
+              </div>
+              <div class="message" id="api-key-status">
+                <span class="message-label">YouTube API</span>
+                <p>Checking API key...</p>
+              </div>
+            </section>
+
+            <div class="flow-arrow" aria-hidden="true">&darr;</div>
+
+            <section class="flow-step">
+              <span class="step-label">Title</span>
+              <label>
+                <span>Title</span>
+                <input id="video-title" name="title" placeholder="Video title will appear here, or type manually.">
+              </label>
+            </section>
+
+            <section class="flow-step">
+              <span class="step-label">Description</span>
+              <label>
+                <span>Description</span>
+                <textarea id="video-description" name="description" rows="6" placeholder="Video description will appear here, or type manually."></textarea>
+              </label>
+            </section>
+
+            <section class="flow-step">
+              <span class="step-label">Transcript</span>
+              <label>
+                <span>Transcript</span>
+                <textarea id="video-transcript" name="transcript" rows="7" placeholder="Transcript will appear here when public captions are available."></textarea>
+              </label>
+            </section>
+
+            <section class="flow-step thumbnail-review">
+              <span class="step-label">Thumbnail</span>
+              <div class="thumbnail-review-grid">
+                <label>
+                  <span>Thumbnail URL</span>
+                  <input id="thumbnail-url" name="thumbnail_url" placeholder="Thumbnail URL from YouTube or manual input.">
+                </label>
+                <div class="thumbnail-preview" id="thumbnail-preview">
+                  <span>No thumbnail loaded</span>
+                </div>
+              </div>
+            </section>
+
+            <div class="flow-arrow" aria-hidden="true">&darr;</div>
+
+            <button type="submit" id="analyze-button">Analyze</button>
+          </form>
+
+          <aside class="result-panel examiner-result" aria-live="polite">
+            <div class="empty-state" id="empty-state">
+              <div class="signal-bars" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <p>Load details or enter fields manually, then click Analyze.</p>
+            </div>
+
+            <div class="message error" id="error-panel" hidden>
+              <span class="message-label">Error</span>
+              <p id="error-text"></p>
+            </div>
+
+            <div class="score-card" id="result-card" hidden>
+              <span class="message-label">Prediction</span>
+              <strong id="result-label"></strong>
+              <p id="result-confidence"></p>
+            </div>
+
+            <div class="probability-card" id="probability-card" hidden>
+              <span class="message-label">Class Probabilities</span>
+              <div id="probability-list"></div>
+            </div>
+
+            <div class="message" id="details-panel" hidden>
+              <span class="message-label">Details</span>
+              <p id="details-text"></p>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const form = document.getElementById("examiner-form");
+      const urlInput = document.getElementById("youtube-url");
+      const loadButton = document.getElementById("load-button");
+      const analyzeButton = document.getElementById("analyze-button");
+      const titleInput = document.getElementById("video-title");
+      const descriptionInput = document.getElementById("video-description");
+      const transcriptInput = document.getElementById("video-transcript");
+      const thumbnailInput = document.getElementById("thumbnail-url");
+      const thumbnailPreview = document.getElementById("thumbnail-preview");
+      const emptyState = document.getElementById("empty-state");
+      const errorPanel = document.getElementById("error-panel");
+      const errorText = document.getElementById("error-text");
+      const resultCard = document.getElementById("result-card");
+      const resultLabel = document.getElementById("result-label");
+      const resultConfidence = document.getElementById("result-confidence");
+      const probabilityCard = document.getElementById("probability-card");
+      const probabilityList = document.getElementById("probability-list");
+      const detailsPanel = document.getElementById("details-panel");
+      const detailsText = document.getElementById("details-text");
+      const apiKeyStatus = document.getElementById("api-key-status");
+      const classOrder = ["False", "Not False"];
+      let currentVideoId = "";
+      let currentWarnings = [];
+
+      function percent(value) {
+        return `${(Number(value || 0) * 100).toFixed(0)}%`;
+      }
+
+      function setThumbnailPreview(url) {
+        const cleanUrl = String(url || "").trim();
+        thumbnailPreview.innerHTML = "";
+        if (!cleanUrl) {
+          const placeholder = document.createElement("span");
+          placeholder.textContent = "No thumbnail loaded";
+          thumbnailPreview.appendChild(placeholder);
+          return;
+        }
+
+        const image = document.createElement("img");
+        image.src = cleanUrl;
+        image.alt = "Video thumbnail";
+        image.onerror = () => {
+          thumbnailPreview.innerHTML = "<span>Thumbnail could not be loaded</span>";
+        };
+        thumbnailPreview.appendChild(image);
+      }
+
+      function showError(message) {
+        emptyState.hidden = true;
+        resultCard.hidden = true;
+        probabilityCard.hidden = true;
+        detailsPanel.hidden = true;
+        errorPanel.hidden = false;
+        errorText.textContent = message;
+      }
+
+      function showResult(data) {
+        const confidence = Number(data.confidence || 0);
+        const probabilities = data.class_probabilities || {};
+        emptyState.hidden = true;
+        errorPanel.hidden = true;
+        resultCard.hidden = false;
+        probabilityCard.hidden = false;
+        detailsPanel.hidden = false;
+
+        resultCard.className = `score-card label-${String(data.label || "").toLowerCase().replace(/\s+/g, "-")}`;
+        resultLabel.textContent = String(data.label || "Unknown").toUpperCase();
+        resultConfidence.textContent = `Confidence: ${percent(confidence)}`;
+
+        probabilityList.innerHTML = "";
+        classOrder.forEach((label) => {
+          const row = document.createElement("div");
+          row.className = "probability-row";
+          row.innerHTML = `
+            <span>${label}</span>
+            <div class="probability-bar"><span style="width: ${percent(probabilities[label])}"></span></div>
+            <strong>${percent(probabilities[label])}</strong>
+          `;
+          probabilityList.appendChild(row);
+        });
+
+        const used = data.used_fields || {};
+        const warnings = (data.warnings || []).join(" ");
+        const evidence = (data.evidence_signals || [])
+          .map((signal) => `${signal.name}=${signal.status}`)
+          .join("; ");
+        detailsText.textContent = `Used title=${Boolean(used.title)}, description=${Boolean(used.description)}, transcript=${Boolean(used.transcript)}, thumbnail shown=${Boolean(thumbnailInput.value)}. Review=${data.review_recommendation || "review_optional"}. Evidence: ${evidence}. ${warnings}`;
+      }
+
+      async function checkApiKeyStatus() {
+        try {
+          const response = await fetch("/health");
+          const data = await response.json();
+          const loaded = Boolean(data.youtube_api_key_loaded);
+          const audio = data.audio_transcript || {};
+          const audioReady = Boolean(audio.ffmpeg && audio.yt_dlp && audio.whisper_backend);
+          apiKeyStatus.className = loaded ? "message" : "message error";
+          apiKeyStatus.querySelector("p").textContent = loaded
+            ? `Loaded. YouTube URL can fetch title, description, thumbnail, and captions. Audio Whisper fallback=${audioReady}.`
+            : `Not loaded. Public title, thumbnail, and captions may still work. Audio Whisper fallback=${audioReady}.`;
+        } catch (error) {
+          apiKeyStatus.className = "message error";
+          apiKeyStatus.querySelector("p").textContent = "Could not check backend API key status.";
+        }
+      }
+
+      async function loadVideoDetails() {
+        if (!urlInput.value.trim()) {
+          showError("Paste a YouTube URL first, or type title and description manually.");
+          return;
+        }
+
+        loadButton.disabled = true;
+        loadButton.textContent = "Loading...";
+        try {
+          const response = await fetch("/api/youtube-metadata", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: urlInput.value, page_data: {} })
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(data.error || "Could not load YouTube details.");
+          }
+
+          currentVideoId = data.video_id || "";
+          currentWarnings = data.warnings || [];
+          titleInput.value = data.title || "";
+          descriptionInput.value = data.description || "";
+          transcriptInput.value = data.transcript || transcriptInput.value;
+          thumbnailInput.value = data.thumbnail_url || "";
+          setThumbnailPreview(data.thumbnail_url);
+
+          if (!data.title && !data.description && !data.transcript) {
+            showError("No title, description, or transcript was loaded. Check the link, add the YouTube API key, or enter fields manually.");
+          } else {
+            errorPanel.hidden = true;
+            emptyState.hidden = false;
+            emptyState.querySelector("p").textContent = "Details loaded. Review them, then click Analyze.";
+          }
+        } catch (error) {
+          showError(error.message);
+        } finally {
+          loadButton.disabled = false;
+          loadButton.textContent = "Load Details";
+        }
+      }
+
+      async function analyzeVideo(event) {
+        event.preventDefault();
+        analyzeButton.disabled = true;
+        analyzeButton.textContent = "Analyzing...";
+
+        try {
+          const response = await fetch("/api/predict-youtube", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              url: urlInput.value,
+              video_id: currentVideoId,
+              page_data: {
+                title: titleInput.value,
+                description: descriptionInput.value,
+                transcript: transcriptInput.value,
+                thumbnail_url: thumbnailInput.value
+              }
+            })
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(data.error || "Prediction failed.");
+          }
+          data.warnings = [...currentWarnings, ...(data.warnings || [])];
+          showResult(data);
+        } catch (error) {
+          showError(error.message);
+        } finally {
+          analyzeButton.disabled = false;
+          analyzeButton.textContent = "Analyze";
+        }
+      }
+
+      loadButton.addEventListener("click", loadVideoDetails);
+      thumbnailInput.addEventListener("input", () => setThumbnailPreview(thumbnailInput.value));
+      form.addEventListener("submit", analyzeVideo);
+      checkApiKeyStatus();
+    </script>
+  </body>
+</html>
