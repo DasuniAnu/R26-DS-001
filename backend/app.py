@@ -43,7 +43,8 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 ALLOWED_AUDIO_EXTENSIONS = {".wav", ".mp3", ".mp4", ".m4a", ".ogg", ".flac", ".webm"}
 
 
-def _fuse_youtube_hate_predictions(audio_prediction: dict, transcript_prediction: dict | None) -> dict:
+def _fuse_youtube_hate_predictions(audio_prediction: dict, transcript_prediction: dict | None,
+                                 asr_needs_review=False) -> dict:
     """Fuse audio and transcript hate predictions for a YouTube segment only."""
     audio_label = audio_prediction["hate_label"]
     text_label = transcript_prediction["prediction"] if transcript_prediction else "NOT_ASSESSED"
@@ -61,10 +62,10 @@ def _fuse_youtube_hate_predictions(audio_prediction: dict, transcript_prediction
         if text_label == "OFF":
             sources.append("Sinhala ASR transcript")
         reason = "Offensive content flagged by " + " and ".join(sources) + "."
-    elif audio_label == "UNCERTAIN" and transcript_prediction is None:
+    elif asr_needs_review or (audio_label == "UNCERTAIN" and transcript_prediction is None):
         label = "UNCERTAIN"
         is_offensive = False
-        reason = "Audio prediction is uncertain and no usable transcript was produced."
+        reason = "A reliable combined result is unavailable; the audio or transcript needs review."
     else:
         label = "NOT"
         is_offensive = False
@@ -191,25 +192,39 @@ def youtube_analyze():
         for seg in segments:
             audio = seg.pop("audio")   # remove numpy array before JSON
             asr_audio = seg.pop("asr_audio", audio)
+            asr_context = seg.pop("asr_context", asr_audio)
+            core_start = seg.pop("asr_core_start", 0)
+            core_end = seg.pop("asr_core_end", len(asr_context))
             # Keep the established VAD-masked hate path; use original audio
             # only for the YouTube deepfake model.
             pred = predict_audio_array(audio, deepfake_audio=asr_audio)
             transcript = ""
             transcript_prediction = None
             asr_status = "NOT_ASSESSED"
+            asr_score = None
+            asr_reason = ""
+            asr_needs_review = False
 
             # VAD/no-speech decisions from the existing audio pipeline prevent
             # unnecessary ASR work and make the result explicitly not assessed.
             if pred["hate_label"] != "NO_SPEECH":
-                candidate_transcript = transcribe_sinhala_audio(asr_audio)
-                if _is_usable_sinhala_transcript(candidate_transcript):
-                    transcript = candidate_transcript
+                try:
+                    recognition = transcribe_sinhala_audio(asr_context, core_start, core_end)
+                except Exception:
+                    app.logger.exception("Transcription failed for segment %s", seg.get("start_time"))
+                    recognition = {"text": "", "score": None, "needs_review": True,
+                                   "reason": "Transcription failed for this segment; manual review is needed."}
+                transcript = recognition["text"]
+                asr_score = recognition["score"]
+                asr_needs_review = recognition["needs_review"] or not _is_usable_sinhala_transcript(transcript)
+                if not asr_needs_review:
                     transcript_prediction = predict_text(transcript)
                     asr_status = "TRANSCRIBED"
                 else:
-                    asr_status = "LOW_QUALITY_OUTPUT"
+                    asr_status = "NEEDS_REVIEW"
+                    asr_reason = recognition["reason"] or "No usable Sinhala transcript; excluded from text hate classification."
 
-            fusion = _fuse_youtube_hate_predictions(pred, transcript_prediction)
+            fusion = _fuse_youtube_hate_predictions(pred, transcript_prediction, asr_needs_review)
             results.append({
                 **seg,
                 **pred,
@@ -217,9 +232,12 @@ def youtube_analyze():
                 "transcript": transcript,
                 "transcript_analysis": transcript_prediction,
                 "asr_status": asr_status,
+                "asr_score": asr_score,
+                "asr_reason": asr_reason,
             })
             del audio
             del asr_audio
+            del asr_context
             
         import gc
         gc.collect()
@@ -235,9 +253,9 @@ def youtube_analyze():
             "hate_segments":   len(hate_segs),
             "fake_segments":   len(fake_segs),
             "both_segments":   len(both_segs),
-            "clean_segments":  total - len(set(
-                [r["start_time"] for r in hate_segs + fake_segs]
-            )),
+            "clean_segments": sum(r["hate_label"] == "NOT" and r.get("authenticity_label") == "REAL"
+                                  for r in results),
+            "review_segments": sum(r["asr_status"] == "NEEDS_REVIEW" for r in results),
             "hate_percentage": round(len(hate_segs) / total * 100, 1) if total else 0,
             "fake_percentage": round(len(fake_segs) / total * 100, 1) if total else 0,
             "transcript_hate_segments": len(transcript_hate_segs),

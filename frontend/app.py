@@ -429,6 +429,9 @@ with tab_yt:
                 st.error(f"❌ Video Analysis Failed: {e}")
                 
         if video_success:
+            if summ.get("review_segments", 0):
+                st.warning(f'{summ["review_segments"]} segment(s) have uncertain transcripts. '
+                           'These transcripts were excluded from text hate classification; please review the audio.')
             # ── 4. Overall Cards ──
             s1, s2, s3 = st.columns(3)
             
@@ -545,12 +548,17 @@ with tab_yt:
                     a_feat = expl.get("audio_features", {})
 
                     transcript = seg.get("transcript", "")
+                    if seg.get("asr_status") == "NEEDS_REVIEW":
+                        st.warning("Transcript needs review. " + seg.get("asr_reason", ""))
+                    if seg.get("asr_score") is not None:
+                        st.caption(f'Recognition score: {seg["asr_score"]:.2f} '
+                                   '(heuristic model score, not transcription accuracy).')
                     transcript_result = seg.get("transcript_analysis") or {}
                     fusion_label = seg.get("hate_label", "NOT_ASSESSED")
                     fusion_color = "#f87171" if fusion_label == "OFF" else "#fbbf24" if fusion_label == "UNCERTAIN" else "#60a5fa" if fusion_label == "NOT_ASSESSED" else "#34d399"
                     if transcript:
-                        transcript_text = transcript
-                    elif seg.get("asr_status") == "LOW_QUALITY_OUTPUT":
+                        transcript_text = escape(transcript)
+                    elif seg.get("asr_status") in {"LOW_QUALITY_OUTPUT", "NEEDS_REVIEW"}:
                         transcript_text = "A reliable Sinhala transcript could not be produced for this segment, so it was excluded from text hate classification."
                     else:
                         transcript_text = "No transcript produced (no speech detected or no usable speech content)."

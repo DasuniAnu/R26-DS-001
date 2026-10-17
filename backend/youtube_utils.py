@@ -16,6 +16,7 @@ from urllib.parse import urlparse, parse_qs
 SAMPLE_RATE    = 16000
 SEGMENT_DURATION = 10                          # seconds
 SEGMENT_SAMPLES  = SAMPLE_RATE * SEGMENT_DURATION  # 160,000
+ASR_CONTEXT_SAMPLES = 2 * SAMPLE_RATE
 MAX_VIDEO_DURATION = 600                       # 10 minutes
 
 TEMP_DIR = os.path.join(tempfile.gettempdir(), "yt_hate_detect")
@@ -139,7 +140,7 @@ def analyze_youtube_video(url: str):
 
         # Keep the original waveform for ASR. VAD masking below is useful for
         # audio classification, but it can remove phonetic detail needed by
-        # Whisper to produce an accurate transcript.
+        # the speech recognizer to produce an accurate transcript.
         asr_audio = audio.copy()
 
         # --- VAD MASKING: Keep only speech, zero out music/noise ---
@@ -166,6 +167,8 @@ def analyze_youtube_video(url: str):
             end = min(start + SEGMENT_SAMPLES, total_samples)
             seg = audio[start:end].copy()
             asr_seg = asr_audio[start:end].copy()
+            context_start = max(0, start - ASR_CONTEXT_SAMPLES)
+            context_end = min(total_samples, end + ASR_CONTEXT_SAMPLES)
 
             if len(seg) < SEGMENT_SAMPLES:
                 seg = np.pad(seg, (0, SEGMENT_SAMPLES - len(seg)), mode="constant")
@@ -185,6 +188,9 @@ def analyze_youtube_video(url: str):
                 "end_fmt":    format_time(end_t),
                 "audio":      seg.astype(np.float32),
                 "asr_audio":  asr_seg.astype(np.float32),
+                "asr_context": asr_audio[context_start:context_end].copy(),
+                "asr_core_start": start - context_start,
+                "asr_core_end": end - context_start,
             })
         return metadata, segments
     finally:

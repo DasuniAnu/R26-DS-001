@@ -1,0 +1,157 @@
+﻿{
+    "metadata":  {
+                     "channel":  "Hiru News",
+                     "duration":  19,
+                     "thumbnail":  "https://i.ytimg.com/vi/OPtEBIYYW9w/sd2.jpg?sqp=-oaymwEoCIAFEOAD8quKqQMcGADwAQH4AbYIgAKAD4oCDAgAEAEYZSBlKGUwDw==\u0026rs=AOn4CLDDNtJPU9VPZeoWQErWEWkdBj0kcA",
+                     "title":  "9 හැවිරිදි මල් කැකුලට හදි කළ නරුම පියා - Hiru News",
+                     "url":  "https://www.youtube.com/watch?v=OPtEBIYYW9w"
+                 },
+    "segments":  [
+                     {
+                         "asr_reason":  "",
+                         "asr_score":  0.9388,
+                         "asr_status":  "TRANSCRIBED",
+                         "audio_authentic":  true,
+                         "audio_hate_label":  "NOT",
+                         "authenticity_confidence":  0.7291041016578674,
+                         "authenticity_label":  "REAL",
+                         "authenticity_probabilities":  {
+                                                            "FAKE":  0.27089589834213257,
+                                                            "REAL":  0.7291041016578674
+                                                        },
+                         "end_fmt":  "00:10",
+                         "end_time":  10.0,
+                         "explanation":  {
+                                             "audio_features":  {
+                                                                    "energy_level":  "Medium",
+                                                                    "has_speech":  true,
+                                                                    "peak_amplitude":  1.0,
+                                                                    "rms_energy":  0.0949,
+                                                                    "silence_ratio":  0.385,
+                                                                    "zero_crossing_rate":  0.0854
+                                                                },
+                                             "fake_explanation":  {
+                                                                      "confidence_level":  "Moderate",
+                                                                      "factors":  [
+                                                                                      "Natural speech characteristics detected",
+                                                                                      "Moderate confidence (72.9%) — mostly natural patterns"
+                                                                                  ],
+                                                                      "margin":  0.4582,
+                                                                      "summary":  "Classified as AUTHENTIC (72.9% confidence). Real probability 72.9% vs fake 27.1%."
+                                                                  },
+                                             "hate_explanation":  {
+                                                                      "confidence_level":  "High",
+                                                                      "factors":  [
+                                                                                      "No significant hate speech patterns in vocal features",
+                                                                                      "High confidence — speech is clearly non-offensive"
+                                                                                  ],
+                                                                      "margin":  0.9953,
+                                                                      "summary":  "Classified as NOT OFFENSIVE (99.8% confidence). Offensive probability only 0.2%."
+                                                                  }
+                                         },
+                         "fusion_reason":  "Neither the audio model nor the transcript model flagged offensive content.",
+                         "hate_confidence":  0.9976446032524109,
+                         "hate_label":  "NOT",
+                         "hate_probabilities":  {
+                                                    "NOT":  0.9976446032524109,
+                                                    "OFF":  0.0023553562350571156
+                                                },
+                         "hate_speech":  false,
+                         "start_fmt":  "00:00",
+                         "start_time":  0.0,
+                         "transcript":  "නවහැවිරදි සියදියණිය බරපතල ලිංගිකාපයෝජනයකට ලක්කළ බවට චෝදනා එල්ල වූ පියෙකු වෙයං ගොඩ පොලිසිය මගින් අතරංගුවට ගෙන තිබෙනවාවිසි හය හැවිරදි",
+                         "transcript_analysis":  {
+                                                     "confidence":  0.9911419153213501,
+                                                     "input_text":  "නවහැවිරදි සියදියණිය බරපතල ලිංගිකාපයෝජනයකට ලක්කළ බවට චෝදනා එල්ල වූ පියෙකු වෙයං ගොඩ පොලිසිය මගින් අතරංගුවට ගෙන තිබෙනවාවිසි හය හැවිරදි",
+                                                     "is_offensive":  false,
+                                                     "prediction":  "NOT",
+                                                     "probabilities":  {
+                                                                           "NOT":  0.9911419153213501,
+                                                                           "OFF":  0.00885811634361744
+                                                                       },
+                                                     "processed_text":  "නවහැවිරදි සියදියණිය බරපතල ලිංගිකාපයෝජනයකට ලක්කළ බවට චෝදනා එල්ල වූ පියෙකු වෙයං ගොඩ පොලිසිය මගින් අතරංගුවට ගෙන තිබෙනවාවිසි හය හැවිරදි",
+                                                     "script_type":  "unicode"
+                                                 },
+                         "transcript_hate_label":  "NOT"
+                     },
+                     {
+                         "asr_reason":  "",
+                         "asr_score":  0.925,
+                         "asr_status":  "TRANSCRIBED",
+                         "audio_authentic":  true,
+                         "audio_hate_label":  "NOT",
+                         "authenticity_confidence":  0.6476831436157227,
+                         "authenticity_label":  "REAL",
+                         "authenticity_probabilities":  {
+                                                            "FAKE":  0.3523169159889221,
+                                                            "REAL":  0.6476831436157227
+                                                        },
+                         "end_fmt":  "00:18",
+                         "end_time":  18.53,
+                         "explanation":  {
+                                             "audio_features":  {
+                                                                    "energy_level":  "Medium",
+                                                                    "has_speech":  true,
+                                                                    "peak_amplitude":  1.0,
+                                                                    "rms_energy":  0.1064,
+                                                                    "silence_ratio":  0.521,
+                                                                    "zero_crossing_rate":  0.0608
+                                                                },
+                                             "fake_explanation":  {
+                                                                      "confidence_level":  "Moderate",
+                                                                      "factors":  [
+                                                                                      "Natural speech characteristics detected",
+                                                                                      "Moderate confidence (64.8%) — mostly natural patterns"
+                                                                                  ],
+                                                                      "margin":  0.2954,
+                                                                      "summary":  "Classified as AUTHENTIC (64.8% confidence). Real probability 64.8% vs fake 35.2%."
+                                                                  },
+                                             "hate_explanation":  {
+                                                                      "confidence_level":  "High",
+                                                                      "factors":  [
+                                                                                      "No significant hate speech patterns in vocal features",
+                                                                                      "High confidence — speech is clearly non-offensive"
+                                                                                  ],
+                                                                      "margin":  0.9945,
+                                                                      "summary":  "Classified as NOT OFFENSIVE (99.7% confidence). Offensive probability only 0.3%."
+                                                                  }
+                                         },
+                         "fusion_reason":  "Neither the audio model nor the transcript model flagged offensive content.",
+                         "hate_confidence":  0.997257649898529,
+                         "hate_label":  "NOT",
+                         "hate_probabilities":  {
+                                                    "NOT":  0.997257649898529,
+                                                    "OFF":  0.0027423929423093796
+                                                },
+                         "hate_speech":  false,
+                         "start_fmt":  "00:10",
+                         "start_time":  10.0,
+                         "transcript":  "ඔහු අත්තනගල්ල මහේස්‍ාතධිකණණයට ඉදිරිපත් කිරීමෙන් අනතුරුව ලබනදහ නම වනදා දක්වා රක්ෂිත බන්ධ‍නාගාරගත කෙරුණා",
+                         "transcript_analysis":  {
+                                                     "confidence":  0.9945976734161377,
+                                                     "input_text":  "ඔහු අත්තනගල්ල මහේස්‍ාතධිකණණයට ඉදිරිපත් කිරීමෙන් අනතුරුව ලබනදහ නම වනදා දක්වා රක්ෂිත බන්ධ‍නාගාරගත කෙරුණා",
+                                                     "is_offensive":  false,
+                                                     "prediction":  "NOT",
+                                                     "probabilities":  {
+                                                                           "NOT":  0.9945976734161377,
+                                                                           "OFF":  0.005402358248829842
+                                                                       },
+                                                     "processed_text":  "ඔහු අත්තනගල්ල මහේස්‍ාතධිකණණයට ඉදිරිපත් කිරීමෙන් අනතුරුව ලබනදහ නම වනදා දක්වා රක්ෂිත බන්ධ‍නාගාරගත කෙරුණා",
+                                                     "script_type":  "unicode"
+                                                 },
+                         "transcript_hate_label":  "NOT"
+                     }
+                 ],
+    "success":  true,
+    "summary":  {
+                    "both_segments":  0,
+                    "clean_segments":  2,
+                    "fake_percentage":  0.0,
+                    "fake_segments":  0,
+                    "hate_percentage":  0.0,
+                    "hate_segments":  0,
+                    "review_segments":  0,
+                    "total_segments":  2,
+                    "transcript_hate_segments":  0
+                }
+}

@@ -1,0 +1,664 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Final viva study guide</title><style>
+:root{--ink:#182b3e;--muted:#52677c;--accent:#14626b;--line:#cfdae3;--paper:#fff}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#edf2f5;color:var(--ink);font:16px/1.7 'Segoe UI','Nirmala UI',Arial,sans-serif}
+a{color:#086678;text-underline-offset:3px}aside{position:fixed;inset:0 auto 0 0;width:286px;background:#102c40;color:#eaf4fb;padding:26px 22px;overflow:auto}
+aside a{color:#d1e6ef;text-decoration:none;display:block;font-size:13px;line-height:1.45;margin:10px 0}aside a:hover{color:white;text-decoration:underline}aside strong{font-size:19px}aside .tag{font-size:11px;letter-spacing:1.5px;color:#96cdd4;text-transform:uppercase}
+main{margin:28px 32px 50px 318px;max-width:1100px;background:var(--paper);padding:45px 55px;border:1px solid #dce5eb;border-radius:8px}
+h1{font-size:38px;line-height:1.2;letter-spacing:-1px;margin:0 0 18px}h2{font-size:26px;line-height:1.35;border-top:2px solid var(--line);padding-top:28px;margin-top:48px;scroll-margin-top:20px}h3{font-size:20px;line-height:1.4;margin-top:30px;color:var(--accent);scroll-margin-top:20px}p{margin:12px 0}li{margin:7px 0}strong{font-weight:650}
+.subtitle{font-size:14px;color:var(--muted);border-left:4px solid var(--accent);padding-left:14px;margin:22px 0 32px}.toolbar{display:flex;gap:15px;align-items:center;margin-bottom:30px;flex-wrap:wrap}.toolbar a,button{font:600 13px 'Segoe UI',sans-serif;border:1px solid var(--line);border-radius:5px;padding:8px 12px;background:#f5fafb;color:var(--accent);text-decoration:none;cursor:pointer}
+table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.55;margin:20px 0;table-layout:auto}th{background:#e5f0f3;color:#183b49;text-align:left}th,td{padding:10px 12px;border:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere}tr:nth-child(even) td{background:#f8fafc}thead{display:table-header-group}
+code{font:0.87em/1.5 Consolas,'Nirmala UI',monospace;background:#edf3f6;padding:2px 4px;border-radius:3px;overflow-wrap:anywhere}pre{border:1px solid #d2e0e8;border-left:4px solid #4a8994;background:#f4f8fa;padding:16px;overflow:auto;font:13px/1.6 Consolas,'Nirmala UI',monospace;border-radius:4px}pre code{background:transparent;padding:0;font-size:inherit;overflow-wrap:normal}blockquote{border-left:4px solid #a7bdca;padding:2px 18px;color:var(--muted)}
+.source{padding:14px 0;font-size:12px;tab-size:4;white-space:normal}.line{display:block;min-height:1.6em;padding-right:15px;white-space:pre}.line:target{background:#fff2b2}.ln{display:inline-block;width:57px;text-align:right;padding-right:15px;color:#6e8292;text-decoration:none;user-select:none}.source code{white-space:normal}summary{cursor:pointer;color:var(--accent);font-weight:650;padding:8px}.note{font-size:13px;color:var(--muted)}
+@media(max-width:1000px){aside{position:static;width:auto;max-height:300px}main{margin:18px;padding:26px}h1{font-size:31px}}
+@media print{body{background:#fff;font-size:10pt;line-height:1.5}aside,.toolbar{display:none}main{margin:0;max-width:none;padding:0;border:0}h1{font-size:26pt}h2{font-size:17pt;break-after:avoid;break-before:page;margin-top:0}h3{font-size:13pt;break-after:avoid}table{font-size:8.5pt}tr{break-inside:avoid}pre{white-space:pre-wrap;font-size:8pt;overflow:visible}pre code,.source code{white-space:pre-wrap;overflow-wrap:anywhere}a{color:inherit}p{orphans:3;widows:3}@page{size:A4;margin:18mm}}
+</style></head><body>
+<aside><p class="tag">R26-DS-001 / Viva preparation</p><strong>Final viva study guide</strong><p class="note" style="color:#b9cdd9">Use Ctrl+F to find a function or question.</p><a href="#1-how-to-use-this-guide">1. How to use this guide</a><a href="#2-your-opening-explanation">2. Your opening explanation</a><a href="#3-file-map-and-responsibilities">3. File map and responsibilities</a><a href="#4-architecture-and-exact-call-chains">4. Architecture and exact call chains</a><a href="#5-models-tensors-and-terminology">5. Models, tensors and terminology</a><a href="#6-backend-preprocessing-py-every-function">6. backend/preprocessing.py — every function</a><a href="#7-backend-audio-utils-py-uploaded-file-preparation">7. backend/audio_utils.py — uploaded-file preparation</a><a href="#8-backend-model-manager-py-all-loaders-and-inference">8. backend/model_manager.py — all loaders and inference</a><a href="#9-backend-youtube-utils-py-video-preparation-and-comments">9. backend/youtube_utils.py — video preparation and comments</a><a href="#10-backend-asr-manager-py-speech-recognition-in-detail">10. backend/asr_manager.py — speech recognition in detail</a><a href="#11-backend-app-py-server-and-every-endpoint">11. backend/app.py — server and every endpoint</a><a href="#12-frontend-app-py-complete-ui-walkthrough">12. frontend/app.py — complete UI walkthrough</a><a href="#13-report-functions-and-their-nested-helpers">13. Report functions and their nested helpers</a><a href="#14-tests-documentation-and-configuration">14. Tests, documentation and configuration</a><a href="#15-most-important-limitations-to-know-before-the-viva">15. Most important limitations to know before the viva</a><a href="#16-point-at-this-line-and-explain-it-practice">16. “Point at this line and explain it” practice</a><a href="#17-training-versus-inference-evidence-you-can-defend">17. Training versus inference: evidence you can defend</a><a href="#18-metrics-and-experimental-design-in-plain-language">18. Metrics and experimental design in plain language</a><a href="#19-mock-viva-concise-answers-plus-follow-up-probes">19. Mock viva: concise answers plus follow-up probes</a><a href="#20-a-live-demonstration-and-debugging-rehearsal">20. A live demonstration and debugging rehearsal</a><a href="#21-revision-checklist-and-glossary">21. Revision checklist and glossary</a><a href="#22-references-and-evidence-boundaries">22. References and evidence boundaries</a></aside><main>
+<div class="toolbar"><a href="SOURCE_ATLAS.html">Open source atlas</a><a href="VIVA_GUIDE.md">Editable Markdown</a><button onclick="window.print()">Print / Save as PDF</button></div>
+<h1 id="final-viva-preparation-guide">Final viva preparation guide</h1><p class="subtitle">A guided walkthrough of every application file, 58 function/method definitions, 44 mock questions and the current implementation’s limitations. About 14,546 words, plus the complete source atlas.</p>
+<h2 id="1-how-to-use-this-guide">1. How to use this guide</h2>
+<p><strong>Project:</strong> R26-DS-001. <strong>Student:</strong> IT22155870, Suwandarathne N.S. <strong>Component:</strong> Multimodal Sinhala Hate Speech and Deepfake Detection in Text and Audio.</p>
+<p>This is a code-based study guide for the project in <code>D:\Studies\Y4S1\RP\AT final</code>, reviewed on 14 October 2026. It explains the current implementation, not an idealized version of it. File and line references are for this snapshot. The companion <code>SOURCE_ATLAS.html</code> contains the complete, numbered application source, a function index, and local call sites. Search it for a function name when practising a code demonstration.</p>
+<p>Read chapters 2–5 first to understand the system. Then follow the backend chapters in execution order, study the frontend, and practise the question bank aloud. For any highlighted code, answer in this order: <strong>purpose → input → operation → output → caller → limitation</strong>. Do not memorize a paragraph without being able to trace its variables.</p>
+<p>The guide explains all application functions, nested report helpers, test methods, configuration files, important statements and UI blocks. Third-party packages in virtual environments are dependencies rather than code you wrote. Model files and training evidence are explained separately. No application behavior has been changed while preparing this guide.</p>
+<p>Suggested revision sessions: 45 minutes architecture and request traces; 60 minutes preprocessing and model inference; 60 minutes YouTube and ASR; 45 minutes frontend, reports and tests; 30 minutes mock questions and demonstration. If time is short, prioritize chapters 2, 4, 10, 15 and 19.</p>
+<h2 id="2-your-opening-explanation">2. Your opening explanation</h2>
+<h3 id="a-60-second-explanation">A 60-second explanation</h3>
+<p>“My component provides Sinhala text and audio analysis through a Streamlit interface and a Flask API. Text is cleaned and classified with a fine-tuned XLM-RoBERTa checkpoint. Audio hate speech uses a Wav2Vec2 classifier, and the deployed audio-authenticity checkpoint is WavLM. For YouTube, I download the audio, resample it to 16 kHz mono and divide it into 10-second analysis segments. The hate-audio path uses speech-masked segments, while the deepfake path preserves the original resampled waveform. A separate Sinhala XLS-R speech recognizer creates transcripts using overlapping context. Reliable-enough transcripts are classified by the text model, and a rule-based decision combines audio and transcript results. Uncertain transcripts are retained for review. Optional Sinhala Unicode comments are analysed separately. The interface shows timestamps, model scores and an HTML report.”</p>
+<h3 id="what-the-research-component-is-and-is-not">What the research component is—and is not</h3>
+<p>The integration covers two modalities, text and audio, with several tasks. It is not one end-to-end multimodal neural network: the classifiers have separate weights and are combined at the decision level. A transcript is derived from the audio, so audio and transcript evidence are related, not statistically independent. Comment predictions are separate from segment-level fusion. YouTube video frames are not analysed; this is audio-deepfake detection, not visual face-swap detection.</p>
+<p>The implemented target labels are <code>OFF</code> and <code>NOT</code>, meaning offensive and non-offensive under the training task. Explain your research title, but do not imply that every offensive word is legally or semantically hate speech against a protected group. The code does not separately classify insult, threat, protected-group targeting and quoted news. Contextual mistakes remain possible.</p>
+<p>Your engineering contribution includes the preprocessing and inference pipeline, endpoint integration, YouTube segmentation, independent handling of audio authenticity, transcript screening and fusion, UI and tests. Pretrained architectures and the external Sinhala ASR checkpoint are reused components. Claim your actual training and evaluation work with its records; do not claim that you invented Wav2Vec2, WavLM or XLM-RoBERTa.</p>
+<h2 id="3-file-map-and-responsibilities">3. File map and responsibilities</h2>
+<table><thead><tr><th>File</th><th>Responsibility</th><th>Called by / entry point</th></tr></thead><tbody>
+<tr><td><code>backend/app.py</code></td><td>HTTP validation, orchestration, fusion, JSON responses, temporary upload cleanup</td><td>Flask routes invoked by frontend requests</td></tr>
+<tr><td><code>backend/preprocessing.py</code></td><td>Text cleaning, script heuristic, targeted romanized-word mapping</td><td><code>model_manager.predict_text</code> and <code>predict_text_batch</code></td></tr>
+<tr><td><code>backend/audio_utils.py</code></td><td>Load, resample, normalize, pad/truncate an uploaded file</td><td><code>model_manager.predict_audio</code></td></tr>
+<tr><td><code>backend/model_manager.py</code></td><td>Lazy model loading, prediction, audio features, template explanations</td><td>Backend routes</td></tr>
+<tr><td><code>backend/youtube_utils.py</code></td><td>Metadata, audio download, VAD, segmentation, comment retrieval</td><td>YouTube routes</td></tr>
+<tr><td><code>backend/asr_manager.py</code></td><td>Cached Sinhala CTC transcription, temporal selection, review score</td><td><code>youtube_analyze</code></td></tr>
+<tr><td><code>backend/test_asr.py</code></td><td>Offline mocked regression tests</td><td><code>unittest</code> discovery, not the running UI</td></tr>
+<tr><td><code>backend/ASR_NOTES.md</code></td><td>Overlap, score and validation documentation</td><td>Developer reference; not executable</td></tr>
+<tr><td><code>backend/requirements.txt</code></td><td>Backend dependency lower bounds</td><td>pip installation</td></tr>
+<tr><td><code>frontend/app.py</code></td><td>Streamlit widgets, HTTP calls, result presentation, report builders</td><td>Streamlit script runner</td></tr>
+<tr><td><code>frontend/.streamlit/config.toml</code></td><td>Theme and server settings</td><td>Streamlit started from frontend directory</td></tr>
+<tr><td><code>frontend/requirements.txt</code></td><td>Streamlit, Requests and ReportLab</td><td>pip installation</td></tr>
+<tr><td><code>models/</code></td><td>Saved model configurations, tokenizers/processors and weights</td><td>Model loaders</td></tr>
+<tr><td><code>notebooks/</code></td><td>Training-related material; not imported by the application</td><td>Separate experimentation</td></tr>
+<tr><td><code>.venv/</code>, <code>frontend/venv/</code></td><td>Installed Python environments</td><td>Python executables used to start services</td></tr>
+<tr><td><code>tmp/</code>, <code>output/</code></td><td>Local test/export artifacts</td><td>Development and report preparation</td></tr>
+</tbody></table>
+<p><strong>Important distinction:</strong> the app&#x27;s temporary audio files go to the operating-system temporary directory, not necessarily the repository&#x27;s <code>tmp</code> folder. <code>tempfile.gettempdir()</code> decides the actual location.</p>
+<h2 id="4-architecture-and-exact-call-chains">4. Architecture and exact call chains</h2>
+<h3 id="two-python-services">Two Python services</h3>
+<pre><code class="language-text">Browser
+  ↕ Streamlit UI protocol
+Streamlit Python process, port 8501 — frontend/app.py
+  ↕ requests.post: JSON or multipart file upload
+Flask Python process, port 5000 — backend/app.py
+  ↕ Python function calls
+Preprocessing / downloads / model loaders / PyTorch inference
+  → Python dictionaries → JSON → Streamlit display</code></pre>
+<p>The <code>requests.post</code> calls run in the Streamlit server process. They are not JavaScript fetch requests directly from the browser. <code>127.0.0.1</code> means the machine hosting the Streamlit process. If the frontend is moved to another server, its API address must point to the actual backend. <code>CORS(app)</code> enables cross-origin browser access, but CORS is not needed for these server-to-server Requests calls and is not authentication.</p>
+<h3 id="manual-text">Manual text</h3>
+<pre><code class="language-text">Text tab / Analyze Text
+→ POST /api/text/predict {text: ...}
+→ text_predict()
+→ predict_text()
+→ preprocess() → clean_text() → is_romanized()
+   → if romanized: clean_noise() → convert_hate_words()
+→ _load_text_model() → tokenizer → XLM-R classification
+→ softmax → argmax → result JSON
+→ label, scores and processed text displayed</code></pre>
+<h3 id="uploaded-audio">Uploaded audio</h3>
+<pre><code class="language-text">Audio tab / file upload / Analyze Audio
+→ POST /api/audio/predict, multipart field audio
+→ audio_predict() → validate extension → save UUID temporary file
+→ predict_audio(filepath) → load_audio(filepath)
+→ 16 kHz mono, peak normalization, first 10 seconds or zero padding
+→ Wav2Vec2 hate classifier AND WavLM authenticity classifier
+→ JSON → two result cards
+→ finally: remove uploaded temporary file</code></pre>
+<p>This path does not use ASR, YouTube VAD, transcript fusion or the 0.60 hate-confidence abstention rule. Both classifiers receive the same prepared upload waveform.</p>
+<h3 id="youtube-audio-and-transcript">YouTube audio and transcript</h3>
+<pre><code class="language-text">YouTube form submitted
+→ POST /api/youtube/metadata → get_video_metadata()
+→ preview title/channel/thumbnail
+→ POST /api/youtube/analyze → youtube_analyze()
+→ analyze_youtube_video()
+   → metadata and duration validation → download_youtube_audio()
+   → librosa.load → preserve original copy
+   → _load_vad() → speech timestamps → mask non-speech samples
+   → fixed 10-second segments + original ASR context windows
+→ for each segment:
+   predict_audio_array(masked, deepfake_audio=original)
+   → audio features, hate classifier, authenticity classifier
+   if not NO_SPEECH:
+     transcribe_sinhala_audio(context, core offsets)
+     → _load_model() → CTC logits → decode_segment()
+     → recognition screen + Sinhala usability screen
+     → accepted text only: predict_text()
+   _fuse_youtube_hate_predictions()
+→ segment dictionaries and summary
+→ timeline, transcript warnings, explanations, HTML report</code></pre>
+<h3 id="optional-comments">Optional comments</h3>
+<p>After audio results have been drawn, the frontend makes a separate comments request if the checkbox is enabled. <code>youtube_comments()</code> calls <code>fetch_youtube_comments()</code>, then filters for at least one Sinhala Unicode character, then calls <code>predict_text_batch()</code>. The results affect the comment summary only. They do not change the audio timestamps or fused segment labels. These operations are sequential, not background jobs.</p>
+<h2 id="5-models-tensors-and-terminology">5. Models, tensors and terminology</h2>
+<h3 id="what-is-actually-deployed">What is actually deployed</h3>
+<table><thead><tr><th>Task</th><th>Runtime class / evidence</th><th>Output</th></tr></thead><tbody>
+<tr><td>Text classification</td><td><code>AutoModelForSequenceClassification</code>; local config says <code>XLMRobertaForSequenceClassification</code>, <code>model_type=xlm-roberta</code></td><td>Two class logits: NOT, OFF</td></tr>
+<tr><td>Audio hate classification</td><td><code>Wav2Vec2ForSequenceClassification</code>; local config agrees</td><td>Two class logits: NOT, OFF</td></tr>
+<tr><td>Audio authenticity</td><td><code>AutoModelForAudioClassification</code>; local config says <code>WavLMForSequenceClassification</code>, <code>model_type=wavlm</code></td><td>REAL, FAKE, with indices read from config</td></tr>
+<tr><td>Sinhala ASR</td><td><code>AutoModelForCTC</code>; default external Sinhala XLS-R checkpoint</td><td>A vocabulary distribution at every audio frame</td></tr>
+<tr><td>Speech activity</td><td>Silero VAD from Torch Hub</td><td>Speech start/end sample positions</td></tr>
+</tbody></table>
+<p>The health endpoint and manual audio tab still contain a hard-coded Wav2Vec2 deepfake label. <strong>The saved deepfake checkpoint is WavLM.</strong> Point to <code>models/model_audio_deepfake/config.json</code>, not stale display text, to establish the architecture.</p>
+<p>All three local classifier configs show hidden size 768 and 12 Transformer layers/12 attention heads. Audio classifier projection size is 256. These are saved architecture settings, not proof of which layers were trained. The text config vocabulary size is 250002; that is a tokenizer vocabulary size, not the number of training sentences. Text max position embeddings 514 does not mean this app uses 514 tokens: inference explicitly limits input to 128.</p>
+<p>XLM-RoBERTa is a multilingual Transformer encoder; the app adds/loads a sequence-classification head rather than generating a free-form response. <a href="https://huggingface.co/docs/transformers/model_doc/xlm-roberta">Official architecture reference</a>.</p>
+<p>Wav2Vec2 takes waveform samples and learns speech representations; its classification and CTC heads solve different tasks. The classifier outputs one class decision for a clip, while CTC outputs a token sequence. <a href="https://huggingface.co/docs/transformers/model_doc/wav2vec2">Official Wav2Vec2 reference</a>.</p>
+<p>WavLM is another pretrained speech representation architecture. This app uses its sequence-classification checkpoint for authenticity; it does not run its pretraining objective during inference. <a href="https://huggingface.co/docs/transformers/model_doc/wavlm">Official WavLM reference</a>.</p>
+<h3 id="shapes-you-should-be-able-to-explain">Shapes you should be able to explain</h3>
+<table><thead><tr><th>Object</th><th>Typical shape</th><th>Meaning</th></tr></thead><tbody>
+<tr><td>Mono 10-second waveform</td><td><code>[160000]</code></td><td>16000 samples per second × 10 seconds</td></tr>
+<tr><td>Audio processor input values</td><td><code>[1, 160000]</code></td><td>Batch dimension added</td></tr>
+<tr><td>Text <code>input_ids</code> and mask</td><td><code>[1, 128]</code>, or <code>[B, 128]</code></td><td>Subword IDs and padding visibility</td></tr>
+<tr><td>Classifier logits</td><td><code>[1, 2]</code>, or <code>[B, 2]</code></td><td>Unnormalized class scores</td></tr>
+<tr><td>Classifier softmax</td><td><code>[1, 2]</code></td><td>Scores normalized over the two classes</td></tr>
+<tr><td>ASR logits</td><td><code>[1, T, V]</code></td><td>Frames × token vocabulary, with a batch dimension</td></tr>
+<tr><td>ASR logits after <code>[0]</code></td><td><code>[T, V]</code></td><td>Single example selected</td></tr>
+<tr><td>CTC argmax IDs</td><td><code>[T]</code></td><td>One highest-scoring token per frame</td></tr>
+</tbody></table>
+<p><code>softmax(z_i) = exp(z_i) / sum_j exp(z_j)</code>. It preserves the ranking of logits but makes values sum to one over the selected axis. <code>argmax</code> gives the winning index; it does not give the winning probability. With <code>[0.2, 0.8]</code>, argmax is 1 and confidence is 0.8. No sigmoid is used because these are mutually exclusive two-class outputs.</p>
+<p><code>dim=1</code> selects classes in <code>[batch, classes]</code>; <code>dim=-1</code> selects vocabulary in <code>[frames, vocabulary]</code>. A tensor is a multidimensional numeric array with device/dtype information; NumPy arrays are used for waveform handling, and PyTorch tensors for model execution. Conversion back to Python <code>float</code>, <code>int</code>, <code>bool</code> and lists makes responses JSON-serializable.</p>
+<p><code>model.eval()</code> changes training-sensitive behavior such as dropout. <code>torch.no_grad()</code> disables gradient recording; <code>torch.inference_mode()</code> additionally removes some inference overhead. Neither context manager replaces <code>eval()</code>, and none of them trains or updates weights. <a href="https://docs.pytorch.org/docs/stable/generated/torch.autograd.grad_mode.inference_mode.html">PyTorch inference-mode reference</a>.</p>
+<h2 id="6-backend-preprocessing-py-every-function">6. backend/preprocessing.py — every function</h2>
+<h3 id="dictionaries-hate-words-and-hate-variations">Dictionaries: HATE_WORDS and HATE_VARIATIONS</h3>
+<p><code>HATE_WORDS</code> maps selected romanized tokens to Sinhala Unicode; <code>HATE_VARIATIONS</code> maps spelling variants to canonical keys first. These dictionaries are input transformations, not the final classifier. A matched token does not immediately return OFF. Some entries are ordinary or context-dependent words, so dictionary membership is not evidence that a sentence is hateful.</p>
+<p>The intended rationale is to reduce selected spelling variation while keeping the rest of a mixed sentence available to the learned model. This is targeted normalization, not complete Sinhala transliteration or translation. Unlisted romanized forms remain unconverted; correctness and bias of the mappings need evaluation.</p>
+<h3 id="clean-text-text-lines-134-147">clean_text(text), lines 134–147</h3>
+<p><strong>Called by:</strong> <code>preprocess</code>. <strong>Returns:</strong> a string. It converts the input to a string, strips outer whitespace, removes URL patterns, the standalone literal <code>URL</code>, mentions, hashtags and standalone digits, then collapses whitespace.</p>
+<p><code>re.sub(pattern, replacement, text)</code> replaces regex matches. Raw strings such as <code>r&#x27;\s+&#x27;</code> make regex backslashes readable. <code>\S+</code> means non-whitespace sequence; <code>\s+</code> means whitespace sequence; <code>\b</code> marks word boundaries. The code removes hashtag content rather than merely deleting <code>#</code>; this can remove meaningful evidence. Regex word classes do not amount to Sinhala linguistic tokenization. The literal <code>URL</code> removal is case-sensitive at this stage.</p>
+<p><strong>Viva answer:</strong> “I reuse the inference preprocessing expected by the text model. Cleaning reduces some social-media noise, but it can also discard useful content; its benefit needs an ablation rather than assumption.”</p>
+<h3 id="clean-noise-text-lines-154-159">clean_noise(text), lines 154–159</h3>
+<p><strong>Called by:</strong> <code>preprocess</code>, only on the romanized branch. It lowercases and uses <code>(.)\1{2,}</code> with replacement <code>\1\1</code> to reduce runs of three or more identical characters to two. Therefore <code>hondaaaa</code> becomes <code>hondaa</code>, not <code>honda</code> as one comment suggests. It is a character rule, not a spelling-correction model. Lowercasing also means the full pipeline does not preserve original casing even though the dictionary converter alone preserves unmatched token spelling.</p>
+<h3 id="is-romanized-text-lines-166-176">is_romanized(text), lines 166–176</h3>
+<p><strong>Called by:</strong> <code>preprocess</code>. It counts characters in U+0D80–U+0DFF and divides by length after removing ordinary spaces. Below 10% Sinhala is considered romanized; an empty denominator returns False. This is script detection, not language identification: an English sentence can be labelled romanized. The ratio includes punctuation and does not explicitly remove every kind of whitespace.</p>
+<h3 id="convert-hate-words-text-lines-183-215">convert_hate_words(text), lines 183–215</h3>
+<p><strong>Called by:</strong> the romanized branch of <code>preprocess</code>. Split on whitespace; detach one trailing punctuation character from <code>.,!?;:&quot;&#x27;</code>; lowercase the lookup token; normalize via <code>HATE_VARIATIONS.get(w, w)</code>; look up <code>HATE_WORDS</code>; reattach punctuation; join with spaces.</p>
+<p><code>dict.get(key, default)</code> avoids a KeyError for unknown words. Only one trailing punctuation character is removed, so repeated punctuation can prevent a match. There is no stemming, morphological analyser, fuzzy edit-distance matching or language model in this function. Variation normalization runs before the direct dictionary lookup and can override a direct key&#x27;s intended mapping.</p>
+<h3 id="preprocess-text-lines-223-251">preprocess(text), lines 223–251</h3>
+<p><strong>Called by:</strong> both single and batch text prediction. It always calls <code>clean_text</code>. It then chooses the script branch. Romanized input gets noise cleaning and targeted conversion; Unicode input gets no extra conversion. Returns <code>(processed_text, script_type)</code>, a tuple unpacked by the caller.</p>
+<p>The script label describes the selected branch, not the final converted output. The final text may be mixed script. A mixed sentence with sufficient Sinhala characters goes down the Unicode branch, so its remaining romanized terms will not be mapped. This is a limitation you can demonstrate honestly.</p>
+<h2 id="7-backend-audio-utils-py-uploaded-file-preparation">7. backend/audio_utils.py — uploaded-file preparation</h2>
+<h3 id="constants-and-load-audio-filepath-max-length-max-length-lines-18-47">Constants and load_audio(filepath, max_length=MAX_LENGTH), lines 18–47</h3>
+<p><strong>Called by:</strong> <code>model_manager.predict_audio</code>, not the YouTube segmentation function. <code>SAMPLE_RATE=16000</code>, <code>MAX_DURATION=10</code>, <code>MAX_LENGTH=160000</code>.</p>
+<p><code>librosa.load(filepath, sr=16000, mono=True)</code> decodes supported media, resamples to the requested rate and produces a mono waveform. Resampling changes sample count to preserve duration; it is not speeding up playback. Mono reduces channel handling and matches expected model inputs. The code then divides by the maximum absolute amplitude when the peak is positive, making peak magnitude one. This preserves relative shape within the recording but changes amplitude and can boost noise.</p>
+<p>Short clips are padded on the right with zeros. Longer clips are truncated to the first 160000 samples. For a 30-second upload, only the first ten seconds are classified; the original full-file peak is calculated before truncation. A five-second clip contains 80000 real samples and 80000 padding samples. Float32 uses four bytes per sample: a 10-second mono array alone is about 640000 bytes, excluding model memory and temporary copies.</p>
+<p><strong>Failure behavior:</strong> a decoding exception returns zeros, which the upload path still classifies. That can produce a misleading result rather than an explicit decode failure. Also, <code>np.max</code> on a successfully decoded empty array can raise an error; the docstring promises more than the implementation guarantees. Do not say this function reliably rejects all corrupt or empty files.</p>
+<p><strong>Why fixed duration?</strong> It aligns input size with the project&#x27;s training/inference convention and bounds CPU work. It is a design tradeoff, not proof that ten seconds is optimal for Sinhala meaning.</p>
+<h2 id="8-backend-model-manager-py-all-loaders-and-inference">8. backend/model_manager.py — all loaders and inference</h2>
+<h3 id="module-setup">Module setup</h3>
+<p><code>Path(__file__).resolve().parent.parent</code> locates the project root relative to this source file, rather than relying on whichever directory the terminal happens to use. Model paths then resolve under <code>models</code>. <code>DEVICE=torch.device(&quot;cpu&quot;)</code> makes runtime inference CPU-only. <code>_cache={}</code> holds loaded processors and models for the lifetime of this backend process. It does not cache predictions, persist after restart, or share memory between separate worker processes.</p>
+<h3 id="load-text-model-lines-42-62">_load_text_model(), lines 42–62</h3>
+<p><strong>Called by:</strong> <code>predict_text</code> and <code>predict_text_batch</code>. Returns cached tokenizer/model if both are present; otherwise loads the local tokenizer and sequence classifier, supplies two labels <code>{0: NOT, 1: OFF}</code>, uses <code>ignore_mismatched_sizes=False</code>, sets evaluation mode/CPU, and stores both in <code>_cache</code>.</p>
+<p>Failing on a mismatched classification head is preferable to silently using incompatible trained weights. <code>from_pretrained</code> loads configuration and weights; it does not mean the request trains a model. “Auto” selects a concrete architecture from configuration. The label mapping in this loader is explicit, so training label semantics must agree.</p>
+<h3 id="load-audio-hate-model-lines-65-81">_load_audio_hate_model(), lines 65–81</h3>
+<p><strong>Called by:</strong> both audio prediction functions. Loads <code>Wav2Vec2Processor</code> and <code>Wav2Vec2ForSequenceClassification</code> from the hate checkpoint. Caches them and sets eval/CPU. The processor bundles preparation logic; its presence does not mean this classification call produces a transcript.</p>
+<p>The saved processor specifies <code>do_normalize=true</code>. This feature-extractor normalization is distinct from the earlier manual peak normalization. Explain both stages if asked why amplitudes change twice.</p>
+<h3 id="load-audio-fake-model-lines-84-106">_load_audio_fake_model(), lines 84–106</h3>
+<p><strong>Called by:</strong> both audio prediction functions. Uses <code>AutoFeatureExtractor</code> and <code>AutoModelForAudioClassification</code> so the configured audio-classifier architecture can be selected. Checks that config labels include REAL and FAKE before caching. The current checkpoint is WavLM, despite a stale comment referring to a future WavLM checkpoint.</p>
+<p>The deepfake preprocessor has <code>do_normalize=false</code>, making the choice to preserve the original YouTube waveform especially relevant. It specifies <code>return_attention_mask=true</code>, but these inference calls pass only input_values to the classifier. Padding therefore is not explicitly masked at model call time; do not claim otherwise.</p>
+<h3 id="deepfake-label-indices-model-lines-109-112">_deepfake_label_indices(model), lines 109–112</h3>
+<p><strong>Called by:</strong> <code>predict_audio</code> and <code>predict_audio_array</code>. Reverses <code>id2label</code> into uppercase label-to-integer positions. Returns <code>(real_idx, fake_idx)</code>. This avoids assuming that index 1 always means FAKE across arbitrary checkpoints. A mislabeled checkpoint is still a problem: reading configuration cannot prove its semantic correctness.</p>
+<h3 id="compute-audio-features-audio-lines-119-143">_compute_audio_features(audio), lines 119–143</h3>
+<p><strong>Called by:</strong> <code>predict_audio_array</code> only. Calculates peak amplitude, root-mean-square energy, an approximate zero-crossing rate and a sample-amplitude “silence ratio.” RMS is <code>sqrt(mean(audio**2))</code>. Zero-crossing rate here is <code>mean(abs(diff(sign(audio)))) / 2</code>; zero samples can contribute half-transitions.</p>
+<p>A sample is called silent if <code>abs(sample)&lt;0.02</code>. <code>has_speech</code> is True if the fraction of such samples is below 0.7. Energy is High if RMS &gt; 0.15, Medium if &gt; 0.05, otherwise Low. All these thresholds are heuristics.</p>
+<p>These features are computed on the VAD-masked, peak-normalized, padded hate waveform in the YouTube path. They are not independent measurements of raw microphone loudness. Padding, slow speech with pauses, and weak voiced samples can drive the silence ratio upward. This is not the same as Silero&#x27;s speech detector and is not a rigorous SNR estimate. RMS/ZCR are not concatenated into the neural model input; they support explanation text and speech-presence decisions.</p>
+<h3 id="generate-explanations-lines-146-236">_generate_explanations(...), lines 146–236</h3>
+<p><strong>Called by:</strong> <code>predict_audio_array</code>. Uses label, winning probability, probability margin, energy and has_speech to select textual templates. Returns hate_explanation, fake_explanation and audio_features. Margin is the absolute difference between the two class probabilities. For binary probabilities summing to one, margin &gt; 0.5 corresponds to winning score &gt; 0.75.</p>
+<p>Confidence categories are High above 0.85, Moderate from 0.60 to 0.85 inclusive, and Low below 0.60. A separate text chooses “decisive/moderate/narrow,” but the <code>decisive</code> variable is currently unused. There is a FAKE UNCERTAIN explanation branch, but the current authenticity inference always returns REAL or FAKE for speech, so that branch is not normally reached.</p>
+<p><strong>Crucial viva answer:</strong> “These are rule-based descriptions of outputs and simple signal statistics, not SHAP, LIME, attention explanations or proof that the model detected a particular causal artifact.” Claims about aggressive tone or manipulation artifacts in the displayed templates should not be treated as measured features. The template says classification was skipped for no speech, but both model forward passes actually occur before those labels are overridden.</p>
+<h3 id="predict-text-raw-text-lines-243-297">predict_text(raw_text), lines 243–297</h3>
+<p><strong>Called by:</strong> manual text route and accepted YouTube transcripts. Preprocess → load tokenizer/model → tokenize to exactly 128 positions using padding and truncation → pass input_ids and attention_mask → obtain logits → softmax over classes → NumPy → argmax → construct result.</p>
+<p><code>attention_mask</code> tells the text model which positions are real input versus padding. 128 means subword tokens including tokenizer-added special tokens, not 128 words or characters. Truncation can lose decisive information near the end of a long comment or transcript. A nonempty raw input can become empty after cleaning; this function still feeds the tokenizer because there is no second empty-text rejection.</p>
+<p>Returned keys: input_text, processed_text, script_type, prediction, is_offensive, confidence, probabilities. The confidence is the winning class softmax score, not evaluated accuracy or a calibrated probability of correctness. The function has no low-confidence abstention branch.</p>
+<h3 id="predict-text-batch-raw-texts-batch-size-16-lines-300-353">predict_text_batch(raw_texts, batch_size=16), lines 300–353</h3>
+<p><strong>Called by:</strong> comments route. Empty list returns an empty list; batch_size below one raises ValueError. It preprocesses each comment once, loads the shared model once, and loops over chunks of at most 16. Each batch is tokenized to <code>[B,128]</code> and classified in one forward pass. It reconstructs results in original order using <code>index=start+offset</code>.</p>
+<p>Batching improves throughput by reducing repeated model-call overhead, but it is not parallel network fetching or asynchronous processing. Padding all texts to 128 simplifies shapes but costs more than dynamic padding for short comments. Result schema matches single-text inference. <code>zip(comments,predictions)</code> later relies on this ordering and matching length.</p>
+<h3 id="predict-audio-filepath-lines-356-432">predict_audio(filepath), lines 356–432</h3>
+<p><strong>Called by:</strong> upload route. Prepares the first ten seconds via <code>load_audio</code>. Runs hate processor/model, gets class probabilities and returns OFF/NOT. Runs the deepfake processor/model on the same waveform and maps REAL/FAKE indices from config. Returns both independent predictions.</p>
+<p>There is no VAD, no speech heuristic, no ASR and no 0.60 abstention here. This explains why an uploaded clip and the same clip analysed through YouTube can produce different outputs. Audio authenticity and offensiveness are different questions: genuine speech can be offensive; synthetic speech can be non-offensive.</p>
+<h3 id="predict-audio-array-audio-deepfake-audio-none-lines-435-522">predict_audio_array(audio, deepfake_audio=None), lines 435–522</h3>
+<p><strong>Called by:</strong> YouTube analysis route. Accepts a prepared NumPy array directly, avoiding a temporary file for every segment. Computes features, runs hate inference, then overrides its label to NO_SPEECH if has_speech is false or UNCERTAIN if winning confidence &lt; 0.60. Otherwise returns the winning hate label. Model probabilities remain present even when the final label abstains.</p>
+<p>For authenticity, use deepfake_audio when supplied, otherwise audio. It always runs inference; if has_speech is false it sets authenticity_label=NO_SPEECH and audio_authentic=True. That Boolean is a bookkeeping choice to avoid a fake flag, <strong>not proof of authenticity</strong>. For speech it always returns REAL or FAKE, with no 0.60 abstention threshold. It attaches template explanations based on the original audio-model results.</p>
+<p><strong>Caching limitation:</strong> these three classifier loaders do not use locks, unlike the ASR loader. Concurrent first requests can race and load duplicate model instances. CPU-only and lazy loading help deployment but do not guarantee low memory: all used models stay cached, and loading all of them can consume substantial RAM.</p>
+<h2 id="9-backend-youtube-utils-py-video-preparation-and-comments">9. backend/youtube_utils.py — video preparation and comments</h2>
+<h3 id="module-constants-and-imports">Module constants and imports</h3>
+<p><code>SAMPLE_RATE=16000</code>, <code>SEGMENT_DURATION=10</code>, <code>SEGMENT_SAMPLES=160000</code>, <code>ASR_CONTEXT_SAMPLES=32000</code>, <code>MAX_VIDEO_DURATION=600</code>. UUID produces collision-resistant filenames. <code>tempfile</code> locates operating-system scratch storage. <code>yt_dlp</code> retrieves metadata/media/comments; FFmpeg converts extracted audio to WAV; librosa converts decoded samples to 16 kHz mono. Requests is used for the official comments API. These are distinct responsibilities: FFmpeg is not a classifier or a speech recognizer.</p>
+<h3 id="format-time-seconds-lines-25-28">format_time(seconds), lines 25–28</h3>
+<p><strong>Called by:</strong> duration error messages and segment creation. Integer division <code>//60</code> gives whole minutes; <code>%60</code> gives remaining seconds; <code>:02d</code> prints two digits. Fractions are truncated for display, while numeric start_time/end_time retain two decimals. A formatted timestamp is not a word alignment.</p>
+<h3 id="get-video-id-url-lines-30-49">get_video_id(url), lines 30–49</h3>
+<p><strong>Called by:</strong> <code>fetch_youtube_comments</code>. Uses <code>urlparse</code> and <code>parse_qs</code> to support youtu.be paths, watch?v=, embed, v, shorts and live forms. It checks the ID against <code>[A-Za-z0-9_-]{11}</code>. Returns None for unsupported or malformed inputs.</p>
+<p>The host check uses <code>endswith(&quot;youtube.com&quot;)</code>, which is broader than exact host/subdomain validation. It should not be presented as a strong domain allowlist. Also, metadata/download functions pass their URL directly to yt-dlp and do not use this validator. Validation coverage differs across endpoints.</p>
+<h3 id="get-video-metadata-url-lines-51-64">get_video_metadata(url), lines 51–64</h3>
+<p><strong>Called by:</strong> metadata endpoint and <code>analyze_youtube_video</code>. Opens YoutubeDL as a context manager and uses <code>extract_info(download=False)</code>. Returns title, duration, channel/uploader fallback, thumbnail and URL. It does not download the media file, although metadata extraction still involves network requests.</p>
+<p>Every extraction exception is wrapped as ValueError with “Invalid URL or video unavailable.” Therefore this message can also represent network, DNS or permission failures. The WinError 10013 seen earlier was blocked network access, not proof that the video was invalid. The frontend preview and analysis each retrieve metadata, so there are repeated network lookups.</p>
+<h3 id="download-youtube-audio-url-lines-66-98">download_youtube_audio(url), lines 66–98</h3>
+<p><strong>Called by:</strong> <code>analyze_youtube_video</code>. Builds a UUID output template and requests <code>bestaudio/best</code>. The preferred extraction clients are android/web. A postprocessor named FFmpegExtractAudio converts the selected source to WAV. Returns <code>(filepath, metadata)</code>; normally the path is UUID.wav, with requested_downloads as a fallback if that path is absent.</p>
+<p>The download stage does not explicitly force 16 kHz mono; that occurs in librosa afterward. Converting a compressed YouTube source to WAV cannot restore information lost by original compression. The exception wrapper mentions FFmpeg, but a download failure may instead involve connectivity, platform restrictions or extraction changes. Failed/intermediate downloads may leave artifacts because cleanup focuses on the successfully selected path.</p>
+<h3 id="load-vad-lines-105-114">_load_vad(), lines 105–114</h3>
+<p><strong>Called by:</strong> <code>analyze_youtube_video</code>. Loads Silero VAD through torch.hub once, retaining model and utility objects in module globals. <code>force_reload=False</code> allows cached reuse; <code>trust_repo=True</code> permits repository code. The first uncached use needs network access. No repository revision is pinned, which weakens reproducibility. No initialization lock is present here.</p>
+<p>VAD means voice activity detection: locating speech intervals, not identifying a speaker, transcribing words or detecting hateful content. The local <code>get_speech_timestamps</code> name is a callable retrieved from the utility tuple, not a function defined in this repository.</p>
+<h3 id="analyze-youtube-video-url-lines-116-201">analyze_youtube_video(url), lines 116–201</h3>
+<p><strong>Called by:</strong> Flask <code>youtube_analyze</code>. It prepares data; it does not itself run the hate, authenticity or ASR classifiers.</p>
+<ol>
+<li>Retrieve metadata. Reject duration &lt;= 0 or duration &gt; 600 seconds.</li>
+<li>Download audio, verify a path exists, decode as 16 kHz mono and reject an empty waveform.</li>
+<li>Copy the decoded original into asr_audio before modifying the hate path.</li>
+<li>Obtain Silero speech timestamps. Make a Boolean mask initially false, set speech intervals true, multiply audio by the mask. Outside speech, samples become zero; no samples are removed, preserving time alignment.</li>
+<li>If VAD raises an exception, warn and continue with raw audio. This fallback means behavior can differ from a successful-VAD run.</li>
+<li>Iterate by 160000 samples. Make a masked hate segment and original same-interval segment. Pad both final classification segments to ten seconds.</li>
+<li>Peak-normalize only the masked hate segment. The original YouTube deepfake waveform is not manually peak-normalized here.</li>
+<li>Build an unpadded original ASR context window extending two seconds to each available side. Store core sample offsets into it.</li>
+<li>Return metadata and segment dictionaries. The finally block removes the downloaded file after arrays have been prepared, even before neural classification starts in the caller.</li>
+</ol>
+<p>Multiplying by a speech mask is not denoising inside speech or separating background music from overlapping speech. It only silences intervals judged non-speech. The split remains fixed-time, not sentence-aware or silence-boundary segmentation. The complete waveform and prepared segment copies are held in memory; it is not streaming inference.</p>
+<p>Example for 19 seconds: segment 0 core is 0–10 seconds with context 0–12; segment 1 core is 10–19 with context 8–19. The second classifier input has one second of padding, but its ASR context does not. Numeric end time can differ from metadata duration because downloaded sample duration and metadata rounding can differ.</p>
+<h3 id="normalise-comments-raw-comments-max-comments-none-lines-203-217">_normalise_comments(raw_comments, max_comments=None), lines 203–217</h3>
+<p><strong>Called by:</strong> official API retrieval and yt-dlp fallback. Strips text, skips empty comments, supplies Unknown author, normalizes likes/like_count, and optionally caps accepted comments. Returns a consistent list of dictionaries. This is schema normalization, not language cleaning or hate classification.</p>
+<h3 id="fetch-comments-from-api-video-id-api-key-max-comments-none-lines-220-263">_fetch_comments_from_api(video_id, api_key, max_comments=None), lines 220–263</h3>
+<p><strong>Called by:</strong> <code>fetch_youtube_comments</code> when YOUTUBE_API_KEY is present. Requests commentThreads with part=snippet, plain text and at most 100 results per page, following nextPageToken. Each request has a 20-second timeout. It extracts the topLevelComment snippet, not every reply in a thread. A non-200 response becomes RuntimeError. No retries, backoff or quota-management policy is implemented.</p>
+<p>If a cap is supplied it applies before the later Sinhala filter, so requesting 100 comments does not guarantee 100 Sinhala comments. With no cap, it follows available pages until completion; this does not guarantee every historical/deleted/private/moderated comment is accessible.</p>
+<h3 id="fetch-youtube-comments-url-max-comments-none-lines-266-312">fetch_youtube_comments(url, max_comments=None), lines 266–312</h3>
+<p><strong>Called by:</strong> Flask comments route. Validate/extract video ID. If an environment API key exists, try the official API. If successful with comments, return them and source=&#x27;YouTube Data API&#x27;. If the API succeeds but returns none, raise ValueError and do not try fallback. Other exceptions are saved as api_error and allow fallback.</p>
+<p>Fallback uses yt-dlp with skip_download=True and getcomments=True, optionally an extractor comment cap. Normalize returned comments and identify source=&#x27;yt-dlp&#x27;. If both paths fail, construct an informative error. The yt-dlp path does not independently filter top-level versus reply comments, so its scope can differ from the official API path. A source field makes that distinction visible.</p>
+<h2 id="10-backend-asr-manager-py-speech-recognition-in-detail">10. backend/asr_manager.py — speech recognition in detail</h2>
+<h3 id="what-ctc-means">What CTC means</h3>
+<p>Connectionist Temporal Classification supports mapping many audio frames to a shorter token sequence without requiring a manual frame-to-character alignment during training. At inference, this code takes the highest-scoring token at each frame, collapses repeated runs and removes blanks. It is greedy decoding: no beam search, external language model or grammar correction is added.</p>
+<p>Example using B for blank: <code>[B, ක, ක, B, ක, ම, ම, B]</code> becomes <code>කකම</code>. The two ක tokens separated by a blank must remain two tokens. That is why the final tokenizer decode uses group_tokens=False: our own run loop has already performed collapsing.</p>
+<h3 id="globals-and-thresholds">Globals and thresholds</h3>
+<p><code>_processor</code> and <code>_model</code> initially None. <code>_model_lock=threading.Lock()</code> protects initialization. <code>MODEL_ID</code> is read from SINHALA_ASR_MODEL or defaults to the Sinhala XLS-R checkpoint. An environment override must remain compatible with the CTC model and convolution-config assumptions; it is not a plug-in switch for any arbitrary recognizer.</p>
+<p><code>MIN_TOKEN_SCORE=0.65</code>, <code>MAX_WEAK_TOKEN_FRACTION=0.25</code>. These are initial engineering heuristics. They were not calibrated against a labelled Sinhala transcription set in the work shown here. A high score does not prove correct spelling, meaning or even faithful transcription.</p>
+<h3 id="load-model-lines-24-42">_load_model(), lines 24–42</h3>
+<p><strong>Called by:</strong> <code>transcribe_sinhala_audio</code> after cheap input checks. Uses a double check around a lock: test whether loading is needed, acquire the lock, check again in case another thread already loaded. It first loads cached processor/model using local_files_only=True; on OSError it tries normal from_pretrained, which can retrieve missing files. Sets eval/CPU and returns both.</p>
+<p>This lock protects initialization, not every inference operation and not other model loaders. The ASR weights are external pretrained/fine-tuned weights. No ASR training occurs in this file. Disk cache and in-process cache are different: disk cache survives a restart; the Python globals do not.</p>
+<h3 id="transcribe-sinhala-audio-audio-core-start-0-core-end-none-lines-82-116">transcribe_sinhala_audio(audio, core_start=0, core_end=None), lines 82–116</h3>
+<p><strong>Called by:</strong> <code>youtube_analyze</code>. Empty input returns review without loading; invalid core interval raises ValueError; NaN/infinity samples return review; essentially zero peak in the core (&lt;1e-7) returns silent review. These checks are not a robust detector of low-volume speech or noise.</p>
+<p>Processor input is the full original context window as float32 at 16 kHz. <code>model(**inputs)</code> unpacks all processor fields as keyword arguments, including any attention mask it provides. <code>logits[0]</code> removes the batch dimension. Inference is CPU and gradients are disabled.</p>
+<p>To map sample offsets to convolutional frame coordinates, initialize stride S=1 and receptive field R=1. For each convolution kernel k and stride s: <code>R = R + (k-1)*S</code>, then <code>S = S*s</code>. Offset is <code>(R-1)/2</code>. A frame&#x27;s approximate centre is <code>offset + frame_index*S</code>. Therefore a sample boundary maps to <code>(sample_boundary-offset)/S</code>.</p>
+<p>For kernels [10,3,3,3,3,2,2] and strides [5,2,2,2,2,2,2], S=320 samples (20 ms at 16 kHz), R=400 samples (25 ms), and offset=199.5 samples. These figures illustrate that configuration; the function calculates from the loaded model rather than hard-coding them. This is the convolutional frame grid, not the full Transformer context receptive field: attention can use the wider window.</p>
+<p>It calls decode_segment with the core frame boundaries. A caught model/decoding exception becomes RuntimeError; the route then converts that segment into review status. An exception in the loader is outside this inner try but is still caught by the route.</p>
+<h3 id="decode-segment-logits-processor-blank-id-frame-start-0-frame-end-none-lines-45-79">decode_segment(logits, processor, blank_id, frame_start=0, frame_end=None), lines 45–79</h3>
+<p><strong>Called by:</strong> transcribe_sinhala_audio and tests. Input is <code>[frames,vocabulary]</code> logits. Softmax produces a token distribution per frame. <code>.max(dim=-1)</code> gives each frame&#x27;s winning score and token ID. The loop finds maximal consecutive runs of identical winning IDs.</p>
+<p>For a run covering <code>[start,end)</code>, midpoint is <code>(start+end-1)/2</code>. Keep it only if it is not blank and its midpoint is in <code>[frame_start,frame_end)</code>. Append one token and the maximum probability in its run. Decode with group_tokens=False and skip_special_tokens=True, then strip whitespace.</p>
+<p>The recognition score is the mean of retained run maxima, not the product of token probabilities, not mean confidence across all frames, and not WER. Blank runs are excluded so confident silence cannot inflate the score. A long token run contributes one value just like a short run. Nonblank special/delimiter tokens can contribute to scoring even if tokenizer decoding later suppresses or transforms them.</p>
+<p><code>weak_fraction</code> counts retained run scores strictly below 0.65. Review is required if text is empty, mean score is strictly below 0.65, or weak_fraction is strictly greater than 0.25. Equality matters: exactly 0.65 is not weak; exactly 25% weak does not trigger the fraction rule. No tokens means score=0 and weak_fraction=1. Return text, four-decimal score, review Boolean and reason.</p>
+<p>Worked example: run scores [0.90, 0.80, 0.40, 0.40] average 0.625 and have weak_fraction=0.5, so review is required. [0.90,0.80,0.70,0.40] average 0.70 with weak_fraction=0.25 passes this numerical screen, but the route&#x27;s Sinhala check may still reject it.</p>
+<h3 id="why-overlap-and-what-it-cannot-guarantee">Why overlap, and what it cannot guarantee</h3>
+<p>Two seconds either side provide acoustic context near a hard boundary and preserve the core&#x27;s intended timestamp. Interior windows can reach 14 seconds. This costs more inference than non-overlapping ten-second windows. It may help boundary recognition, but improvement has not been measured here.</p>
+<p>Each window is inferred separately. Midpoint selection prevents duplicate assignment when decoding intervals from the same logits; it does not prove perfect deduplication across independent window predictions, whose token timing can differ. Words can split across display segments. This is not global forced alignment or sentence-level decoding. Slow speech may still be excluded earlier by the sample-amplitude speech heuristic. There is no automatic speed correction or denoising.</p>
+<h2 id="11-backend-app-py-server-and-every-endpoint">11. backend/app.py — server and every endpoint</h2>
+<h3 id="import-time-setup-and-executable-entry">Import-time setup and executable entry</h3>
+<p>On Windows, search the user&#x27;s WinGet Packages tree for FFmpeg bin folders and prepend the first existing match to PATH. This helps yt-dlp locate the executable; it does not install FFmpeg or verify which build is best. Flask(__name__) creates the app, CORS(app) enables cross-origin headers, and os.makedirs(..., exist_ok=True) creates the upload directory if needed.</p>
+<p><code>if __name__ == &quot;__main__&quot;:</code> starts the server only when run as the main script. Importing this module in tests registers routes and performs setup but does not start app.run. Host 0.0.0.0 binds all network interfaces; localhost is one way to reach it, not the only exposed interface. Port is 5000 and debug=False. This is the Flask development server, with no application authentication, database or worker queue here.</p>
+<h3 id="route-contracts">Route contracts</h3>
+<table><thead><tr><th>Method and path</th><th>Input</th><th>Success output</th><th>Frontend timeout</th></tr></thead><tbody>
+<tr><td>GET /api/health</td><td>None</td><td>status, service, model description strings</td><td>Not routinely polled by UI</td></tr>
+<tr><td>POST /api/text/predict</td><td>JSON text</td><td>success and result dictionary</td><td>120 seconds</td></tr>
+<tr><td>POST /api/audio/predict</td><td>multipart audio file</td><td>success and both predictions</td><td>180 seconds</td></tr>
+<tr><td>POST /api/youtube/metadata</td><td>JSON url</td><td>success and metadata</td><td>60 seconds</td></tr>
+<tr><td>POST /api/youtube/analyze</td><td>JSON url</td><td>success, metadata, segments, summary</td><td>600 seconds</td></tr>
+<tr><td>POST /api/youtube/comments</td><td>JSON url; optional max_comments</td><td>success, comments, summary, source</td><td>1800 seconds</td></tr>
+</tbody></table>
+<p>Timeouts stop the client waiting; they do not guarantee cancellation of an already running backend operation. Returned percentages are segment/comment fractions, not test-set accuracy and not necessarily duration-weighted exposure.</p>
+<h3 id="health-lines-93-104">health(), lines 93–104</h3>
+<p>Returns an “ok” dictionary through jsonify. It does not load or test models, check FFmpeg, contact YouTube or run a prediction. Thus a healthy endpoint proves the Flask process responds, not that all inference dependencies work. Its deepfake description is stale relative to the WavLM config.</p>
+<h3 id="text-predict-lines-108-127">text_predict(), lines 108–127</h3>
+<p>Decorator registers the path and POST method. <code>request.get_json(silent=True)</code> returns parsed JSON or None instead of raising for parsing failure. Missing text/blank text gives 400. Valid stripped text goes to predict_text. Exceptions inside inference return 500 with an error message.</p>
+<p>It checks presence and emptiness, not strict JSON schema/type: a number or null as text can fail at <code>.strip()</code> outside the inference try. Length limits, authentication and rate limiting are absent. The endpoint should not be described as production-hardened.</p>
+<h3 id="audio-predict-lines-131-168">audio_predict(), lines 131–168</h3>
+<p>Requires multipart field audio, a nonempty filename and a lowercased extension in the allowed set. It generates a new UUID filename rather than trusting the client&#x27;s path. Saves under UPLOAD_DIR, calls predict_audio and returns JSON. Finally removes the file, swallowing OSError on deletion.</p>
+<p>Extension validation does not prove content type or safe decoding. There is no explicit upload-size limit in this code. UUID reduces name collisions and prevents use of a supplied directory path, but does not replace content checks. Cleanup occurs after success or inference failure; a process crash can still leave files.</p>
+<h3 id="is-usable-sinhala-transcript-text-lines-83-89">_is_usable_sinhala_transcript(text), lines 83–89</h3>
+<p><strong>Called by:</strong> youtube_analyze after ASR. Builds a list of non-whitespace alphanumeric characters. Requires at least three Sinhala-block characters and a Sinhala fraction &gt;= 0.25 within that list. <code>sum(Boolean expressions)</code> counts True values because True behaves as 1.</p>
+<p>This rejects some empty/non-Sinhala outputs, not all hallucinations. Sinhala vowel signs/combining marks may not pass isalnum, so this is not grapheme counting or language validation. Valid very short utterances can be rejected; syntactically wrong Sinhala can pass. The docstring&#x27;s reference to rejecting hallucinations overstates the guarantee.</p>
+<h3 id="fuse-youtube-hate-predictions-lines-46-80">_fuse_youtube_hate_predictions(...), lines 46–80</h3>
+<p><strong>Called by:</strong> youtube_analyze, after audio and optional text predictions. This is decision-level rule fusion, not learned fusion, probability averaging or majority vote.</p>
+<table><thead><tr><th>Audio label</th><th>Accepted transcript</th><th>ASR needs review</th><th>Fused label</th></tr></thead><tbody>
+<tr><td>NO_SPEECH</td><td>Normally absent</td><td>Any</td><td>NOT_ASSESSED</td></tr>
+<tr><td>OFF</td><td>Any</td><td>Any</td><td>OFF</td></tr>
+<tr><td>NOT or UNCERTAIN</td><td>OFF</td><td>False</td><td>OFF</td></tr>
+<tr><td>NOT</td><td>Absent</td><td>True</td><td>UNCERTAIN</td></tr>
+<tr><td>UNCERTAIN</td><td>Absent</td><td>Any</td><td>UNCERTAIN</td></tr>
+<tr><td>UNCERTAIN</td><td>NOT</td><td>False</td><td>NOT</td></tr>
+<tr><td>NOT</td><td>NOT</td><td>False</td><td>NOT</td></tr>
+</tbody></table>
+<p>Branch order matters: no-speech wins first, then any offensive evidence, then review/uncertainty, then non-offensive. Setting hate_speech=False for UNCERTAIN means “not positively flagged,” not “known safe.” The returned dictionary preserves audio_hate_label, transcript_hate_label and fusion_reason separately from the fused hate_label.</p>
+<p>Why OR for OFF? It lets either usable path surface offensive content that the other misses. Tradeoff: a false positive in either branch can flag the segment, and ASR errors can propagate into text decisions. There is no measured proof here that this fusion improves precision/recall over every single model.</p>
+<h3 id="youtube-analyze-lines-173-283">youtube_analyze(), lines 173–283</h3>
+<p>Validate URL presence/blankness. Ask youtube_utils for arrays and metadata. For each segment, pop array fields and ASR offsets so they do not enter jsonify. <code>.pop(key, default)</code> both retrieves and removes a field; this also reduces references retaining large arrays.</p>
+<p>Run predict_audio_array with masked audio and original deepfake audio. Initialize transcript fields. If the audio label is not NO_SPEECH, call ASR. Catch a transcription exception locally, log its traceback and produce a review result for this segment. Keep even an uncertain candidate transcript for display; call predict_text only when both ASR score screening and Sinhala usability pass. A later text-classifier exception is not handled by this inner ASR catch and can still fail the whole request.</p>
+<p>Build the result using <code>{**seg, **pred, **fusion, ...}</code>. In a dictionary merge, later values overwrite earlier duplicate keys. Thus fusion replaces pred&#x27;s hate_label and hate_speech, while hate_confidence, hate_probabilities and explanations still refer to the audio classifier. There is <strong>no computed fused probability</strong>. This distinction is essential when a transcript causes OFF while the audio classifier says NOT.</p>
+<p><code>del audio</code> etc. removes local references, not every copy or cached model. <code>gc.collect()</code> asks Python to collect unreachable cyclic objects; it does not unload cached model weights or guarantee that OS memory immediately drops.</p>
+<p>Summary counts are based on segment decisions. Hate/fake/both overlap and must not be added as mutually exclusive categories. Clean requires fused NOT and authenticity REAL. review_segments counts ASR NEEDS_REVIEW, not every source of uncertainty. Percentages divide flagged count by all segments, so a one-second last segment counts equally to a ten-second segment and unassessed segments remain in the denominator.</p>
+<p>ValueError and RuntimeError in the outer block return 400; other exceptions return 500. This is a simple error convention, not precise HTTP classification for all upstream/network/model failures. The endpoint processes segments sequentially and returns the final JSON only when all are processed; it does not stream per-segment progress.</p>
+<h3 id="youtube-metadata-lines-287-298">youtube_metadata(), lines 287–298</h3>
+<p>Requires a nonempty URL, calls get_video_metadata and returns success/metadata. ValueError becomes 400, other errors 500. It gives the frontend a quick preview before a longer analysis call. It does not enforce the ten-minute limit itself; analysis does that later.</p>
+<h3 id="youtube-comments-lines-302-363">youtube_comments(), lines 302–363</h3>
+<p>Requires URL. Optional max_comments is converted with int then clamped to at least one. This is not a strict whole-number validator: some numeric inputs can be truncated, and booleans are integer-like. Fetch comments, keep only those containing any Sinhala Unicode-block character, batch-classify text, and zip original comments with ordered predictions.</p>
+<p>Returns author, text, likes, offensive Boolean and confidence per retained comment. total_fetched is actually the number retained and analysed after filtering, not every raw retrieved comment. One Sinhala character is enough, so mixed-language comments can pass. Romanized-only Sinhala comments are excluded here even though manual text inference supports a romanized branch. Comment likes are displayed data, not a model input or weighting factor.</p>
+<h2 id="12-frontend-app-py-complete-ui-walkthrough">12. frontend/app.py — complete UI walkthrough</h2>
+<h3 id="imports-and-startup-lines-1-54">Imports and startup, lines 1–54</h3>
+<p>Streamlit draws widgets and results. Requests calls Flask. BytesIO holds PDF bytes in memory. Path locates fonts. html.escape protects inserted text from being interpreted as markup. datetime timestamps exported reports. The json import is presently unused.</p>
+<p>API_BASE is fixed to http://127.0.0.1:5000. set_page_config establishes title, shield icon, wide layout and collapsed sidebar. The CSS defines the dark gradient, typography, tabs, text boxes, buttons, cards, probability bars, detail rows and animations. Class names such as rc-safe/rc-danger only style the UI; colors do not change predictions. The Inter font import needs an external font request, with a fallback font if unavailable. Selectors based on Streamlit&#x27;s rendered DOM may be fragile across upgrades.</p>
+<p><code>st.markdown(..., unsafe_allow_html=True)</code> enables custom markup rather than displaying it as text. Some external values are escaped, but title/channel, manual processed text and displayed comment author/text are inserted without consistent explicit escaping. Do not claim complete sanitization because the transcript alone is escaped. Inline event attributes in custom HTML should not be assumed to work identically across Streamlit versions/sanitization behavior.</p>
+<h3 id="streamlit-execution-model">Streamlit execution model</h3>
+<p>Streamlit ordinarily reruns the Python script top to bottom after widget interactions. A form batches its widgets until submission. The app creates three tab containers and uses <code>with tab_text</code>, <code>with tab_audio</code>, <code>with tab_yt</code> to place elements. Those blocks are presentation containers, not separate Flask routes or separate Python processes. <a href="https://docs.streamlit.io/get-started/fundamentals/main-concepts">Streamlit execution model</a>.</p>
+<p>This file does not use st.session_state to preserve analysis results across reruns and does not cache prediction requests. Results live in local variables under button/form-submit conditions. A later widget interaction may therefore cause results to disappear, rather than retrieving stored results. Backend model caching is independent of frontend reruns. The UI is not a persistent case-management system.</p>
+<h3 id="cbar-v-cls-lines-57-58">cbar(v, cls), lines 57–58</h3>
+<p><strong>Called by:</strong> manual text/audio cards and YouTube segment cards. Returns an HTML outer bar plus inner bar whose width is int(v*100) percent. It truncates the displayed width to an integer; text elsewhere may show one decimal place. The function assumes v is a valid 0–1 score and has no clamp. cls chooses a color class such as cbar-r or cbar-g.</p>
+<h3 id="header-and-text-tab-lines-279-315">Header and text tab, lines 279–315</h3>
+<p>Hero markup and <code>st.tabs</code> create the shell. The text area supplies text_input; Analyze Text produces text_go. Only a clicked button with nonblank input performs the POST. <code>json={...}</code> sends structured JSON, not query parameters. A spinner shows the request is running, not a quantified progress estimate.</p>
+<p>The response is decoded with .json(), then success determines the branch. Display uses is_offensive, confidence and probabilities. Processing details show script_type and the first 100 processed characters; the actual model input is not truncated at 100 characters by this UI operation. Model input truncation is 128 tokenizer positions in the backend. ConnectionError gets a specific startup hint; other exceptions use a generic error. The text tab does not call raise_for_status before JSON parsing.</p>
+<h3 id="audio-tab-lines-317-356">Audio tab, lines 317–356</h3>
+<p>file_uploader permits the listed extensions; st.audio provides playback. The upload object is a file-like buffer. <code>audio_file.seek(0)</code> rewinds it so earlier playback/read operations do not leave the POST starting at the end. <code>files={&quot;audio&quot;: (...)}</code> creates multipart upload matching request.files in Flask.</p>
+<p>The MIME value is always audio/wav even for other accepted formats; it is a declared label rather than a conversion operation. The backend decoder actually reads the content. Two columns show independent hate and authenticity results, plus separate probabilities. The “Max 10s analysed” note is important. Model info hard-codes Wav2Vec2 for deepfake, while the deployed checkpoint is WavLM.</p>
+<h3 id="youtube-form-and-preview-lines-359-411">YouTube form and preview, lines 359–411</h3>
+<p>st.form keeps URL typing and the optional comment checkbox together. clear_on_submit=False preserves widget input. On submit, initialize result/status variables and placeholders. st.empty makes a replaceable UI slot. st.status supplies a progress container. The metadata request uses 60-second timeout; non-200 or exceptions show errors. Successful metadata displays thumbnail/title/channel/duration. <code>divmod(duration,60)</code> returns minutes and seconds together.</p>
+<p>If metadata_ready is false, st.stop terminates the current script execution, not the Flask process. It prevents later analysis from running with missing metadata. Success starts a second request to /api/youtube/analyze with a 600-second timeout. This is a synchronous request; progress messages are phase-level, not live backend segment updates.</p>
+<h3 id="summary-and-render-comment-card-lines-433-481">Summary and render_comment_card(), lines 433–481</h3>
+<p>If video_success, display a review warning where necessary and three cards: fused hate, authenticity, comments. The nested render_comment_card function reads comment_card, comments_success, comments_finished, analyze_comments and summ_c from the surrounding module execution context. It is called once before optional comment retrieval and again after completion, updating the same placeholder.</p>
+<p>Its success branch shows offensive count/total and percentage. Otherwise it shows Processing or N/A. “Processing” is a UI state before the later synchronous comments request, not evidence that another thread is fetching comments simultaneously. The hate summary card can be green when there are zero flagged segments even if some segments need review; read it with the warning and detailed statuses.</p>
+<h3 id="visual-timeline-lines-485-530">Visual timeline, lines 485–530</h3>
+<p>Each segment&#x27;s width is its actual numeric duration divided by video metadata duration. The timeline widths are duration-weighted, unlike summary percentages based on segment counts. Color priority: no speech, uncertainty, both offensive+fake, offensive, fake, otherwise green. A segment with uncertain hate and fake authenticity can therefore appear purple; both facts should be read in the detail panel.</p>
+<p>The “SAFE”/“Clean” wording is a model-result display label, not a guarantee of safety or truth. There is a tooltip per interval, but no timestamp-linked playback/navigation is implemented by these divs. Rounding durations can produce tiny visual gaps or totals slightly different from 100%.</p>
+<h3 id="segment-expanders-and-transcript-panel-lines-535-579">Segment expanders and transcript panel, lines 535–579</h3>
+<p>Each segment builds an issue list and expands automatically if flagged/uncertain. It extracts stored explanation dictionaries. NEEDS_REVIEW shows a warning and reason; a non-None ASR score is shown to two decimals with an explicit statement that it is not transcription accuracy. Candidate text is escaped before HTML insertion. The panel separates audio_hate_label, transcript label and fused label and includes fusion_reason.</p>
+<p>If the transcript is empty, it distinguishes unavailable/rejected text from the no-speech case. LOW_QUALITY_OUTPUT is supported as a legacy display value; new code returns NEEDS_REVIEW. Labels can legitimately differ because different paths assess different evidence.</p>
+<h3 id="hate-and-authenticity-detail-cards-lines-581-681">Hate and authenticity detail cards, lines 581–681</h3>
+<p>Cards show confidence, probability bars, rule-based factors and summaries. The hate card selects its headline using the fused hate_label but shows hate_confidence/probabilities/explanation from the audio classifier. Therefore it can display a fused OFF headline alongside an audio NOT explanation. The API already exposes the separate labels; the presentation should be described as an area needing clearer separation, not as a calibrated fused-confidence display.</p>
+<p>Another mismatch: fused no-speech is NOT_ASSESSED, but the hate-card branch checks NO_SPEECH. It can therefore display “Not Offensive” inside a no-speech segment even though the transcript/fusion panel correctly says NOT_ASSESSED. The timeline still notices authenticity_label=NO_SPEECH. The deepfake UNCERTAIN display branch is currently defensive/legacy because speech authenticity classification is binary.</p>
+<h3 id="signal-features-comments-and-downloads-lines-683-775">Signal features, comments and downloads, lines 683–775</h3>
+<p>The feature strip shows energy, RMS, silence ratio, speech heuristic and ZCR supplied by the backend. It does not calculate new acoustic explanations in the browser. Optional comments are requested after audio rendering, with timeout=1800. Comment failure warns without discarding already rendered audio results. Only offensive comments are listed, though summary counts include all analysed Sinhala-filtered comments.</p>
+<p>The report filename retains alphanumeric characters, spaces, dashes and underscores, replaces spaces with underscores, truncates the title to 50 characters, and appends a timestamp. This sanitizes a download filename; it does not sanitize every HTML value. The active download button calls build_youtube_html_report and serves text/html. No current button calls the PDF builder. Footer/model branding is static text rather than a live reflection of loaded checkpoint metadata.</p>
+<h2 id="13-report-functions-and-their-nested-helpers">13. Report functions and their nested helpers</h2>
+<h3 id="build-youtube-pdf-report-frontend-lines-61-215">build_youtube_pdf_report(...), frontend lines 61–215</h3>
+<p><strong>Current caller:</strong> none in the active frontend download flow. It remains defined and could be called programmatically. It returns PDF bytes from BytesIO, using ReportLab&#x27;s SimpleDocTemplate, Paragraph, Table, Spacer and HRFlowable. A story is a list of flowable layout objects; doc.build lays them out into pages. ParagraphStyle sets font/spacing, TableStyle sets borders/fills/padding, repeatRows repeats table headers.</p>
+<p>It imports ReportLab inside the function so failure becomes a specific RuntimeError only if called. It attempts to register Nirmala UI fonts from Windows, otherwise falls back to Helvetica. A fallback font does not guarantee Sinhala glyph coverage or correct shaping; real Sinhala output requires visual verification. <code>datetime.now()</code> uses host local time without an explicit project timezone.</p>
+<p>Inputs: video metadata; summary; segment dictionaries; comments; optional comments summary; source string; original URL. It builds video information, metric cards, timeline rows, optional flagged-comment tables, method notes and page footers. It uses the existing prediction result; it does not rerun a model.</p>
+<p>Nested functions:</p>
+<table><thead><tr><th>Function</th><th>Called by</th><th>Purpose and detail</th></tr></thead><tbody>
+<tr><td>text(value), 109–110</td><td>PDF metadata, cards, comments and explanatory text</td><td>Converts None to Not available, converts to string, XML-escapes for ReportLab Paragraph markup</td></tr>
+<tr><td>section(name), 112–113</td><td>Repeated PDF section starts</td><td>Returns a heading Paragraph and horizontal-rule flowable</td></tr>
+<tr><td>metric_card(label,value,accent), 115–121</td><td>Four overview cards</td><td>Returns a one-cell styled table; fixed height can be sensitive to long content</td></tr>
+<tr><td>page_decor(canvas,document), 123–131</td><td>doc.build onFirstPage/onLaterPages callbacks</td><td>Draws footer line, title and page number, preserving canvas state with saveState/restoreState</td></tr>
+</tbody></table>
+<p>Inside this function, importing xml.sax.saxutils.escape shadows the global html.escape name locally. Both are escaping utilities but serve different markup contexts. KeepTogether is imported but not used. Some color variables are also unused; unused imports/variables are not active functionality.</p>
+<h3 id="build-youtube-html-report-lines-218-277">build_youtube_html_report(...), lines 218–277</h3>
+<p><strong>Called by:</strong> the active download block near the end of the YouTube tab. Returns a full standalone HTML string with UTF-8 declaration, responsive CSS and print rules. It builds timeline rows, metadata, summary cards and optionally flagged-comment rows. Nested <code>value(item)</code> converts None and applies html.escape. <code>&#x27;&#x27;.join(timeline)</code> concatenates row strings without separators. Doubled braces in f-strings represent literal CSS braces.</p>
+<p>A standalone HTML download is portable and can be opened offline; fonts use local fallbacks. It is a static snapshot, not an interactive API-connected report. The page contains predictions already computed, not saved model weights or a database record.</p>
+<h3 id="report-limitation-examiners-may-notice">Report limitation examiners may notice</h3>
+<p>Both builders reconstruct hate_label as OFF if hate_speech else NOT, and authenticity as FAKE if not audio_authentic else REAL. This collapses UNCERTAIN/NOT_ASSESSED/NO_SPEECH into apparently decisive labels. They do not include transcript text, ASR review scores or the new review count in the timeline. Their hate confidence is the audio classifier score even if the label resulted from fusion.</p>
+<p><strong>Defensible answer:</strong> “The detailed UI/API preserve uncertainty, but the older export format still reduces it to Booleans. I would update export columns to use the explicit label fields and include transcript review information before treating the report as a complete audit record.” This is a verified limitation, not a feature added in this review.</p>
+<h2 id="14-tests-documentation-and-configuration">14. Tests, documentation and configuration</h2>
+<h3 id="backend-test-asr-py-class-and-helper-map">backend/test_asr.py — class and helper map</h3>
+<p>Tokenizer is a tiny fake tokenizer, not the real Sinhala vocabulary. Tokenizer.decode asserts group_tokens=False and maps IDs 1,2,3 to a few Sinhala characters. RecognitionTests inherits unittest.TestCase. Its decode helper creates synthetic four-class logits and invokes the actual decode_segment. Its request helper patches heavy dependencies, creates a Flask test client, posts a fake URL and returns result JSON plus mock objects so tests can inspect calls.</p>
+<p>patch.object replaces an attribute temporarily inside a context manager and restores it afterward. Patch where the caller looks up the name: routes use imported functions on the app module, so patching api.predict_text is appropriate. return_value simulates success; side_effect simulates an exception. SimpleNamespace creates an object with attributes such as tokenizer. A lambda is a small anonymous function; here it returns no speech timestamps.</p>
+<table><thead><tr><th>Test method</th><th>What it verifies</th><th>What it does not prove</th></tr></thead><tbody>
+<tr><td>test_context_is_excluded_and_repeated_letters_survive</td><td>CTC context crop and repeated letters across blanks</td><td>Natural Sinhala transcription accuracy</td></tr>
+<tr><td>test_boundary_run_is_assigned_once</td><td>One run belongs to one adjacent interval in the same logits</td><td>Perfect consistency across separately inferred windows</td></tr>
+<tr><td>test_low_scores_and_blank_only_need_review</td><td>Weak predictions/empty decoding require review</td><td>Empirically optimal score thresholds</td></tr>
+<tr><td>test_blank_frames_do_not_inflate_score</td><td>Strong blank frames do not hide a weak emitted token</td><td>Probability calibration</td></tr>
+<tr><td>test_silence_and_nonfinite_input_do_not_load_model</td><td>Empty, zero and NaN input avoid a model load</td><td>All corrupt media handling</td></tr>
+<tr><td>test_context_and_original_deepfake_audio_are_separate</td><td>19-second context boundaries, classification padding, original waveform preservation</td><td>VAD accuracy; VAD is mocked</td></tr>
+<tr><td>test_uncertain_transcript_does_not_classify_or_count_clean</td><td>No text classification for review; uncertain fusion and count</td><td>Real-world false-positive rate</td></tr>
+<tr><td>test_accepted_transcript_still_contributes</td><td>Accepted transcript can produce fused OFF</td><td>Correctness of the mocked classifier</td></tr>
+<tr><td>test_asr_failure_keeps_audio_result</td><td>ASR failure does not erase independent audio OFF</td><td>Recovery from every backend failure</td></tr>
+<tr><td>test_no_speech_skips_asr</td><td>No-speech skips transcription and text prediction</td><td>That neural audio inference itself was skipped</td></tr>
+</tbody></table>
+<p><code>unittest.main()</code> enables direct execution; discovery finds methods beginning test_. assertEqual checks values, assert_not_called verifies a dependency was not invoked, and np.testing.assert_array_equal compares waveform samples exactly. A deliberately simulated ASR failure may print a traceback while the test still passes—that is expected logging of the injected exception.</p>
+<p>The earlier work recorded ten tests passing and one real-video end-to-end request succeeding. A fresh test result for this guide is recorded in the companion validation notes. Functional tests establish control-flow correctness within the cases tested, not model precision, fairness, or robustness.</p>
+<h3 id="asr-notes-md">ASR_NOTES.md</h3>
+<p>This file documents overlap, frame assignment, heuristic thresholds, review behavior, the test command and the need for held-out manual reference transcripts. It is not loaded by Python and cannot change runtime behavior. If you edit a threshold in documentation without changing asr_manager, the program will not change.</p>
+<h3 id="requirements-and-environments">Requirements and environments</h3>
+<p>Backend requirements list Flask, flask-cors, Transformers, torch, safetensors, NumPy, librosa, soundfile and yt-dlp. Frontend requirements list Streamlit, Requests and ReportLab. Requests is also imported by youtube_utils but is not explicitly listed in the backend requirements: the current environment may obtain it transitively, but it should be declared for reproducibility. FFmpeg is an external executable, not installed by those pip requirements.</p>
+<p>The version specifications are lower bounds (<code>&gt;=</code>), not a lockfile. A fresh install can resolve different versions. The local saved model configs record Transformers 5.0.0 as serialization metadata, not necessarily the currently installed version. Exact runtime versions should be recorded separately before reproducing experiments.</p>
+<h3 id="frontend-streamlit-config-toml">frontend/.streamlit/config.toml</h3>
+<p>Dark theme, primary/background/text colors and sans-serif font establish defaults. headless=true suppresses automatic browser launching; port=8501 selects the frontend port. CSS in app.py can override or supplement theme settings. Start Streamlit from the frontend directory so this project-local .streamlit folder is discovered as intended.</p>
+<h2 id="15-most-important-limitations-to-know-before-the-viva">15. Most important limitations to know before the viva</h2>
+<table><thead><tr><th>Observation in current code</th><th>Accurate explanation / improvement direction</th></tr></thead><tbody>
+<tr><td>Health/manual UI says Wav2Vec2 deepfake; checkpoint says WavLM</td><td>Trust configuration and actual loaded class; synchronize display labels</td></tr>
+<tr><td>Upload and YouTube use different preprocessing and decision rules</td><td>Explain each path; do not promise identical predictions</td></tr>
+<tr><td>Masking non-speech is described like noise removal</td><td>It does not remove overlapping noise during speech</td></tr>
+<tr><td>Silence heuristic examines padded normalized samples</td><td>Pauses, padding and short speech can lead to NO_SPEECH; evaluate separately</td></tr>
+<tr><td>Model forwards run before no-speech override</td><td>It skips usable output/ASR, not all neural computation</td></tr>
+<tr><td>Explanation templates mention tone/artifacts</td><td>They are not direct feature attribution or causal explanations</td></tr>
+<tr><td>Fused label overwrites audio label but not confidence</td><td>No fused probability exists; retain/display separate evidence</td></tr>
+<tr><td>Export collapses review/no-speech statuses into NOT/REAL</td><td>Older report schema needs explicit multi-state labels</td></tr>
+<tr><td>ASR thresholds are initial heuristics</td><td>Calibrate on development references; evaluate held-out data</td></tr>
+<tr><td>Overlap uses independently inferred windows</td><td>Boundary mistakes and split words remain possible</td></tr>
+<tr><td>Script heuristic calls low-Sinhala input romanized</td><td>It cannot distinguish English from romanized Sinhala reliably</td></tr>
+<tr><td>Comments filter accepts any Sinhala-block character</td><td>It is not full language identification; Romanized-only comments are excluded</td></tr>
+<tr><td>Temporary uploads use extension checks only</td><td>Content/size validation and explicit decode errors are future hardening</td></tr>
+<tr><td>Classifier/VAD lazy loaders have no locks</td><td>Concurrent first requests can duplicate loading</td></tr>
+<tr><td>CORS is permissive; server binds all interfaces</td><td>Prototype access configuration, not access control</td></tr>
+<tr><td>No session-state result persistence</td><td>UI reruns may lose displayed results</td></tr>
+<tr><td>No background job queue or backend progress stream</td><td>Long CPU requests are synchronous and can time out</td></tr>
+<tr><td>Dependencies/Torch Hub revision are not pinned</td><td>Reproducibility needs versions, hashes and model lineage</td></tr>
+<tr><td>Text cleaning removes hashtag content and numbers</td><td>It may remove meaningful context; evaluate cleaning ablations</td></tr>
+<tr><td>Boolean false is used for unassessed hate</td><td>Always interpret alongside the explicit label</td></tr>
+</tbody></table>
+<p>This table is preparation for honest technical discussion. It is not a claim that every limitation has already caused a measured failure, and no fixes were applied as part of writing this guide.</p>
+<h2 id="16-point-at-this-line-and-explain-it-practice">16. “Point at this line and explain it” practice</h2>
+<h3 id="a-decorators-and-json">A. Decorators and JSON</h3>
+<pre><code class="language-python">@app.route(&quot;/api/text/predict&quot;, methods=[&quot;POST&quot;])
+def text_predict():
+    data = request.get_json(silent=True)</code></pre>
+<p>The decorator associates a URL and method with a Python handler. Flask invokes it after a matching HTTP request; the frontend does not import and call text_predict directly. silent=True concerns JSON parsing errors, not logging or model confidence. HTTP POST carries user content for computation; GET health requests simply inspect service status.</p>
+<pre><code class="language-python">return jsonify({&quot;success&quot;: True, &quot;result&quot;: result})</code></pre>
+<p>jsonify serializes supported Python values and produces an HTTP JSON response. Arrays must be removed or converted beforehand. The frontend&#x27;s resp.json() reverses this transport step into a Python dictionary. HTTP success, application success and model classification correctness are three different ideas.</p>
+<h3 id="b-dictionaries-mutation-and-precedence">B. Dictionaries, mutation and precedence</h3>
+<pre><code class="language-python">asr_context = seg.pop(&quot;asr_context&quot;, asr_audio)
+results.append({**seg, **pred, **fusion, &quot;transcript&quot;: transcript})</code></pre>
+<p>pop removes a field from seg and returns it, falling back if absent. The fallback supports older segment dictionaries. Double-star unpacks mappings. If pred and fusion both contain hate_label, fusion wins because it comes later. append adds one result to the list; it does not send an incremental HTTP response.</p>
+<pre><code class="language-python">transcript_result = seg.get(&quot;transcript_analysis&quot;) or {}</code></pre>
+<p>get may return None; <code>or {}</code> replaces a falsey value with an empty mapping so later .get calls are safe. This does not fabricate a prediction. In contrast, <code>if value is not None</code> preserves valid zero values, which matters for showing ASR score 0.0.</p>
+<h3 id="c-arrays-slicing-and-copies">C. Arrays, slicing and copies</h3>
+<pre><code class="language-python">end = min(start + SEGMENT_SAMPLES, total_samples)
+asr_seg = asr_audio[start:end].copy()
+seg = np.pad(seg, (0, SEGMENT_SAMPLES - len(seg)), mode=&quot;constant&quot;)</code></pre>
+<p>Python slices include start and exclude end. min avoids stepping beyond available samples. NumPy slicing can produce a view; copy makes an independent array so subsequent modifications do not alter the original. The pad tuple adds zero samples to the left and the required number to the right. The length guard prevents negative padding.</p>
+<pre><code class="language-python">mask[ts[&#x27;start&#x27;]:ts[&#x27;end&#x27;]] = True
+audio = audio * mask</code></pre>
+<p>A Boolean mask multiplies speech by one and non-speech by zero. Array positions stay in place, preserving timestamp correspondence. Removing samples with audio[mask] would instead concatenate speech and shift timing; that is not what this implementation does.</p>
+<h3 id="d-model-execution-and-numeric-conversions">D. Model execution and numeric conversions</h3>
+<pre><code class="language-python">with torch.no_grad():
+    logits = h_model(input_values=inp[&quot;input_values&quot;].to(DEVICE)).logits
+    probs = torch.softmax(logits, dim=1).cpu().numpy()[0]
+    pred = int(np.argmax(probs))</code></pre>
+<p>with scopes gradient disabling. <code>.to(DEVICE)</code> selects CPU here. Calling the model invokes its forward pass. <code>.logits</code> selects raw classifier scores from the returned object. Softmax normalizes the class dimension; <code>.cpu()</code> ensures host memory before NumPy; <code>[0]</code> selects the first batch item. int removes a NumPy scalar type for ordinary Python/JSON use. There is no backward pass or optimizer step.</p>
+<pre><code class="language-python">model.eval()</code></pre>
+<p>This does not evaluate test-set accuracy. It selects inference behavior for the model&#x27;s layers. Accuracy evaluation requires labelled examples and metric computation elsewhere.</p>
+<h3 id="e-ctc-runs">E. CTC runs</h3>
+<pre><code class="language-python">while end &lt; len(ids) and ids[end] == ids[start]:
+    end += 1
+midpoint = (start + end - 1) / 2</code></pre>
+<p>The inner loop extends one identical-token run. The subtraction of one reflects that end is exclusive, so the last frame is end-1. Midpoints can be fractional. Then frame_start &lt;= midpoint &lt; frame_end determines membership in the central interval.</p>
+<pre><code class="language-python">token_scores.append(max(scores[start:end]))</code></pre>
+<p>It uses the most confident frame of each run. This makes the score less dominated by uncertain edges of a token but can make it optimistic. It is a heuristic design choice to validate, not a mathematically calibrated transcript correctness estimate.</p>
+<h3 id="f-locks-and-global-state">F. Locks and global state</h3>
+<pre><code class="language-python">with _model_lock:
+    if _processor is None or _model is None:
+        ...</code></pre>
+<p>Only one thread enters the protected initialization at a time. Checking again after acquiring the lock avoids redundant loading if another thread completed it while this one waited. global declarations let the function assign module-level model references. This lock is in-process, not a distributed lock across multiple servers.</p>
+<h3 id="g-exception-handling-and-resource-cleanup">G. Exception handling and resource cleanup</h3>
+<pre><code class="language-python">try:
+    audio_file.save(temp_path)
+    result = predict_audio(temp_path)
+finally:
+    ...</code></pre>
+<p>The finally block runs when the try block exits normally or through an exception, including when a return was prepared. It is for cleanup rather than deciding whether the prediction was correct. <code>except OSError: pass</code> tolerates failed deletion, at the cost of hiding a cleanup problem.</p>
+<p><code>raise RuntimeError(...) from exc</code> keeps the original exception as the cause. <code>app.logger.exception</code> records a traceback from the active exception. Returning raw exception text to clients is convenient in a prototype but can reveal implementation details.</p>
+<h3 id="h-file-uploads-and-file-buffers">H. File uploads and file buffers</h3>
+<pre><code class="language-python">audio_file.seek(0)
+files={&quot;audio&quot;: (audio_file.name, audio_file, &quot;audio/wav&quot;)}</code></pre>
+<p>seek rewinds a stream. The tuple supplies the multipart filename, readable content object and MIME declaration. The field name must match the backend&#x27;s request.files lookup. MIME text does not transcode the audio.</p>
+<h3 id="i-templates-and-escaping">I. Templates and escaping</h3>
+<pre><code class="language-python">transcript_text = escape(transcript)</code></pre>
+<p>Escaping represents markup characters as text so user-derived content cannot become unintended HTML structure. This is unrelated to cleaning text for ML; escape belongs at the output boundary, while preprocess belongs before classification. A single escaped field does not secure other unescaped interpolations.</p>
+<pre><code class="language-python">f&quot;{confidence:.1%}&quot;
+f&quot;{minutes:02d}:{seconds:02d}&quot;</code></pre>
+<p>The first formats 0.853 as 85.3%; the second prints two-digit integers. Formatting changes presentation, not underlying predictions. Raw CSS braces inside an f-string are doubled as {{ and }}.</p>
+<h3 id="j-python-shorthand-you-will-see-throughout">J. Python shorthand you will see throughout</h3>
+<table><thead><tr><th>Syntax</th><th>Meaning in this project</th></tr></thead><tbody>
+<tr><td><code>def name(...):</code></td><td>Define a reusable function; its body runs when called</td></tr>
+<tr><td><code>-&gt; dict</code>, <code>audio: np.ndarray</code></td><td>Type hints; they do not enforce validation automatically</td></tr>
+<tr><td><code>dict | None</code></td><td>Type annotation allowing a dictionary or None; requires compatible Python syntax</td></tr>
+<tr><td><code>_helper</code></td><td>Convention for internal function; not access enforcement</td></tr>
+<tr><td><code>**inputs</code> in a call</td><td>Expand dictionary entries into keyword arguments</td></tr>
+<tr><td><code>**mapping</code> in a dict</td><td>Merge key/value pairs, with later duplicates overriding earlier ones</td></tr>
+<tr><td><code>list[str]</code></td><td>Type hint for a list of strings</td></tr>
+<tr><td><code>[r for r in results if ...]</code></td><td>List comprehension: filter and build a new list</td></tr>
+<tr><td><code>sum(condition for r in results)</code></td><td>Count True conditions</td></tr>
+<tr><td><code>enumerate(segs)</code></td><td>Obtain zero-based index and value together</td></tr>
+<tr><td><code>zip(comments,predictions)</code></td><td>Pair corresponding items; stops at the shorter input</td></tr>
+<tr><td><code>value if condition else other</code></td><td>Conditional expression, often for labels/colors</td></tr>
+<tr><td><code>None</code></td><td>Explicit absence; different from empty string, zero or False</td></tr>
+<tr><td><code>with ...</code></td><td>Enter/exit a context for a resource, lock, inference mode or UI container</td></tr>
+<tr><td><code>return a,b</code></td><td>Return a tuple that can be unpacked by the caller</td></tr>
+<tr><td><code>os.environ.get(...)</code></td><td>Read configuration from the process environment</td></tr>
+<tr><td><code>Path(__file__)</code></td><td>Locate this source file, not the current command directory</td></tr>
+<tr><td><code>del variable</code></td><td>Remove a reference; not guaranteed complete deallocation</td></tr>
+<tr><td><code>if __name__ == &#x27;__main__&#x27;</code></td><td>Execute startup only when run as a script</td></tr>
+</tbody></table>
+<h2 id="17-training-versus-inference-evidence-you-can-defend">17. Training versus inference: evidence you can defend</h2>
+<p>The application files contain inference, not training loops. There are no optimizer updates, loss.backward calls or Trainer.train calls in the backend request paths. Config/weight loading reuses learned parameters. Training history, dataset provenance and reported metrics must be linked to the exact exported checkpoint.</p>
+<h3 id="text-notebook-evidence-inspected">Text notebook evidence inspected</h3>
+<p><code>notebooks/final text module.ipynb</code> is a JSON notebook. Inspected cells load <code>sinhala-nlp/SOLD</code>, map NOT to 0 and OFF to 1, use xlm-roberta-base, and define a SinhalaDataset with max_len=128 and both input IDs and attention masks. The shown run_experiment uses three epochs, training batch size 16, evaluation batch size 32, warmup_steps=100, weight_decay=0.01, epoch evaluation, save_strategy=&#x27;no&#x27;, load_best_model_at_end=False, and fp16=True. Therefore its shown final evaluation uses last-epoch weights, not automatically selected best-epoch weights.</p>
+<p>A metrics function computes accuracy, macro-F1 and ROC-AUC. Some romanized comparisons reuse the same split indices for raw and transformed inputs, an important fairness measure. This guide does not certify the entire notebook&#x27;s experiment lineage or copy historical output scores as the deployed model&#x27;s performance. The snippet does not explicitly set learning_rate in TrainingArguments; do not invent a custom learning rate for it without verifying the exact runtime/default or other experiment records.</p>
+<h3 id="audio-training-artifact-inspected">Audio training artifact inspected</h3>
+<p><code>notebooks/final audio module.ipynb</code> is actually plain Python text despite its .ipynb filename. Its opening comments describe an older 60-file-per-task setup (30 per class). It uses stratified 80/20 splits with seed 42, Wav2Vec2ForSequenceClassification, frozen wav2vec2 parameters, 15 epochs, batch size 4, and learning rates 1e-4 for hate and 5e-5 for the older deepfake experiment. It uses epoch evaluation and no checkpoint-saving selection.</p>
+<p>These are facts about that script, not proof that the deployed WavLM model was trained with those data/settings. The current WavLM checkpoint config proves architecture, not dataset size, data splits, augmentation, measured metrics or training provenance. Obtain the actual WavLM training/comparison notebook and experiment logs if your viva includes those claims. Do not quote old comments as the final dataset count.</p>
+<h3 id="questions-to-prepare-evidence-for">Questions to prepare evidence for</h3>
+<p>Where did each dataset come from? How were labels defined and verified? What licence/consent applies? How many independent speakers, recordings and source videos are in each split? Were duplicates or near-duplicates removed before splitting? Did the same speaker/source/generator appear in train and test? Were augmentation variants split after the originals were separated? Was there a validation set independent of the final test set? Did repeated test inspection influence model selection? What checkpoint hash corresponds to the results table?</p>
+<p>Stratification preserves label proportions but does not prevent speaker/source leakage. A fixed random seed supports repeatability but is not proof of fully deterministic hardware execution. A small test set produces uncertain estimates. Frozen pretrained encoders reduce trainable parameters but do not remove the need for representative data.</p>
+<h2 id="18-metrics-and-experimental-design-in-plain-language">18. Metrics and experimental design in plain language</h2>
+<h3 id="classification-metrics">Classification metrics</h3>
+<p>Treat OFF (or FAKE for authenticity) as the positive class. True positive means correctly flagged; false positive means flagged but actually negative; false negative means missed positive; true negative means correctly unflagged. State which class is positive before giving formulas.</p>
+<table><thead><tr><th>Metric</th><th>Formula / idea</th><th>What it helps explain</th></tr></thead><tbody>
+<tr><td>Accuracy</td><td>(TP+TN)/(TP+TN+FP+FN)</td><td>Overall correctness; can hide class imbalance</td></tr>
+<tr><td>Precision</td><td>TP/(TP+FP)</td><td>Of flagged cases, how many are truly positive?</td></tr>
+<tr><td>Recall</td><td>TP/(TP+FN)</td><td>Of real positives, how many were detected?</td></tr>
+<tr><td>F1</td><td>2×precision×recall/(precision+recall)</td><td>Balance between precision and recall</td></tr>
+<tr><td>Macro-F1</td><td>Average of per-class F1 values</td><td>Gives both classes equal weight</td></tr>
+<tr><td>Confusion matrix</td><td>Counts by true and predicted class</td><td>Reveals types and direction of errors</td></tr>
+<tr><td>ROC-AUC</td><td>Ranking performance across score thresholds</td><td>Requires continuous positive-class scores, not only argmax labels</td></tr>
+<tr><td>Review rate</td><td>Reviewed / all eligible samples</td><td>Cost and coverage of abstention</td></tr>
+</tbody></table>
+<p>Zero denominators need explicit handling. A high softmax confidence on one example is not dataset accuracy. The video&#x27;s hate_percentage is a flagged-segment rate, not model precision. If a system abstains, report coverage/review rate along with performance on accepted samples; otherwise rejecting difficult cases can create misleading accuracy improvements.</p>
+<h3 id="transcription-metrics">Transcription metrics</h3>
+<p>WER = (substitutions + deletions + insertions) / reference word count. CER uses the same edit operations at character level. Both need human reference transcripts and a declared normalization/tokenization policy. Sinhala spacing and combining-character handling can affect counts. ASR score 0.93 is not “93% WER accuracy.” A transcript can sound plausible and still replace a critical word that changes the hate decision.</p>
+<h3 id="an-evaluation-plan-for-the-new-asr-changes">An evaluation plan for the new ASR changes</h3>
+<p>Build a fixed set of clear, slow, quiet, noisy and music-backed Sinhala clips with independently checked reference text. Run old non-overlap and new overlap pipelines on the same audio/model. Compare WER/CER, latency, review rate and downstream text/fused errors. Evaluate the speech-presence gate separately so missed speech is not hidden by evaluating only accepted clips. Tune thresholds on a development set, then report untouched test results. Include cases around segment boundaries and rare/offensive words rather than only easy news clips.</p>
+<p>Ablations can compare audio-only, transcript-only, OR fusion, overlap versus none, screening versus none, and VAD mask versus original audio. Keep splits and compute conditions consistent. A successful smoke test proves the workflow executes, not that the proposed enhancement improves these metrics.</p>
+<h2 id="19-mock-viva-concise-answers-plus-follow-up-probes">19. Mock viva: concise answers plus follow-up probes</h2>
+<h3 id="architecture-and-scope">Architecture and scope</h3>
+<p><strong>Q1. What exactly makes the project multimodal?</strong> Text and audio are processed through different learned encoders. For YouTube, audio and derived-text decisions are combined. It is a modular decision-fusion system, not one jointly trained cross-modal network. <strong>Follow-up:</strong> show _fuse_youtube_hate_predictions.</p>
+<p><strong>Q2. Why Flask and Streamlit?</strong> Flask provides clear reusable HTTP inference endpoints; Streamlit lets the prototype expose inputs and results quickly in Python. The separation makes backend logic testable without the browser. <strong>Tradeoff:</strong> the current UI is synchronous and not designed for high-concurrency deployment.</p>
+<p><strong>Q3. Where is the database?</strong> There is no database in this component. Results are returned to the UI and can be exported; temporary audio files are cleaned up. <strong>Follow-up:</strong> explain why no persistent history is available.</p>
+<p><strong>Q4. Is the YouTube thumbnail analysed?</strong> No. It is displayed as metadata; no vision model processes video frames. Authenticity refers to audio.</p>
+<p><strong>Q5. Why can the first request be slower?</strong> Model files are read and model objects initialized lazily on first use; later requests reuse process caches. A restart clears those caches. Network and CPU time also contribute.</p>
+<p><strong>Q6. Does health=ok prove all models work?</strong> No. It only proves that the health handler responds. Use representative inference and dependency checks for deeper readiness.</p>
+<h3 id="models-and-preprocessing">Models and preprocessing</h3>
+<p><strong>Q7. Why XLM-RoBERTa?</strong> It provides multilingual pretrained text representations and can be fine-tuned for the Sinhala offensive-language label task. This is a suitability rationale; superiority over alternatives requires comparison results. <strong>Follow-up:</strong> show the local config and 128-token inference call.</p>
+<p><strong>Q8. Which deepfake model is running?</strong> The local config identifies WavLMForSequenceClassification. AutoModelForAudioClassification reads that configuration. Some display strings still say Wav2Vec2 and should be corrected separately.</p>
+<p><strong>Q9. Does the dictionary make the final decision?</strong> No. It normalizes selected romanized words before the learned text classifier. The model still decides OFF/NOT from tokenized context.</p>
+<p><strong>Q10. Does is_romanized recognise Sinhala language?</strong> No. It measures the fraction of Sinhala Unicode-block characters. It can call English romanized, so it is a script heuristic.</p>
+<p><strong>Q11. Why normalize text the same way as training?</strong> To reduce train–inference mismatch. Changing preprocessing can change token distributions and invalidate comparisons. The exact checkpoint&#x27;s training pipeline must be verified, not assumed solely from a comment.</p>
+<p><strong>Q12. Why 16 kHz?</strong> It matches the saved processors and the project&#x27;s inference convention, providing consistent timing and input representation. Setting a rate parameter does not make any arbitrary waveform correctly resampled; librosa performs that conversion here.</p>
+<p><strong>Q13. Why ten seconds?</strong> It bounds CPU/memory work and matches the application&#x27;s fixed-length classifier preparation. It may truncate meaning in uploads; YouTube is segmented to cover its audio. Optimality requires duration experiments.</p>
+<p><strong>Q14. Can this classify a silent uploaded file?</strong> The upload route lacks the YouTube no-speech gate and still produces binary model predictions. That is a limitation; a positive model score does not establish meaningful speech.</p>
+<p><strong>Q15. Why preserve original YouTube audio for deepfake detection?</strong> Masking and peak normalization can alter waveform cues relevant to authenticity. The deepfake branch therefore receives the original resampled interval, while the hate branch receives the speech mask. This rationale needs evaluation on representative deepfakes; it is not an automatic accuracy guarantee.</p>
+<h3 id="transcription-and-uncertainty">Transcription and uncertainty</h3>
+<p><strong>Q16. How is ASR different from audio hate classification?</strong> ASR outputs a character/token sequence over time. Audio hate classification returns two clip-level logits. They use different trained heads/checkpoints despite both being in the Wav2Vec2 family.</p>
+<p><strong>Q17. Why overlap?</strong> The model sees some neighbouring sound instead of encountering every boundary with no context. Only core token runs are retained for that segment. It increases computation and does not completely solve boundary words.</p>
+<p><strong>Q18. How do you map a token to a segment?</strong> Use the model&#x27;s convolution stride and receptive-field centre to map sample offsets to frames; assign each nonblank identical-token run by its midpoint.</p>
+<p><strong>Q19. Why remove blanks from scoring?</strong> Many confident blanks can dominate a mean and hide uncertain actual characters. We score emitted token runs instead.</p>
+<p><strong>Q20. Why 0.65 and 25%?</strong> They are initial heuristic screening settings, not empirically optimal thresholds. The next evaluation should tune them on a labelled development set and assess a held-out set.</p>
+<p><strong>Q21. Can a high-score transcript be wrong?</strong> Yes. Model confidence and correctness differ, especially with noise, domain shift and unfamiliar vocabulary. The Sinhala-character check cannot validate meaning.</p>
+<p><strong>Q22. Are you using Whisper?</strong> No. The default runtime ASR is a Sinhala fine-tuned XLS-R CTC checkpoint. Historical comments or cached alternative models do not change what MODEL_ID loads.</p>
+<p><strong>Q23. What if transcription fails?</strong> The current route logs the exception, marks the segment for review, skips text classification and retains independent audio results. It does not silently label an absent transcript safe.</p>
+<p><strong>Q24. Can slow speech still fail?</strong> Yes. Long pauses or a short final utterance can trigger the upstream silence-ratio gate, preventing ASR entirely. Overlap helps a different problem—context near boundaries.</p>
+<h3 id="fusion-and-outputs">Fusion and outputs</h3>
+<p><strong>Q25. How do you combine audio and text?</strong> A rule sets OFF if either the audio or an accepted transcript is OFF. It handles no-speech and uncertainty explicitly. This is decision-level OR fusion, not averaging calibrated probabilities.</p>
+<p><strong>Q26. If audio says OFF and transcript is uncertain?</strong> Keep OFF from independent audio evidence, while marking the transcript for review.</p>
+<p><strong>Q27. If audio is UNCERTAIN and accepted text says NOT?</strong> The implemented rule returns NOT. This allows accepted text to resolve that audio uncertainty; its tradeoff should be evaluated.</p>
+<p><strong>Q28. Is displayed hate confidence a fused score?</strong> No. After fusion the API keeps the original audio score. The separate transcript result has its own text score. The UI needs careful reading and clearer labeling.</p>
+<p><strong>Q29. Why distinguish NOT, UNCERTAIN and NOT_ASSESSED?</strong> NOT is a usable negative decision; UNCERTAIN means insufficient reliability; NOT_ASSESSED means no suitable speech assessment occurred. Collapsing these into false loses meaning.</p>
+<p><strong>Q30. Does REAL mean the recording is certainly genuine?</strong> No. It is the classifier&#x27;s label within its learned distribution. It is not forensic proof or a cryptographic authenticity guarantee.</p>
+<p><strong>Q31. Are explanations based on attention or SHAP?</strong> No. They are templates selected from labels, score margins and simple audio statistics. They should not be described as causally identifying model evidence.</p>
+<p><strong>Q32. Does 50% hate mean half the video duration?</strong> Not necessarily. It means half the segments were flagged; the last short segment has equal count weight. Timeline widths, in contrast, use duration.</p>
+<h3 id="comments-ui-and-reports">Comments, UI and reports</h3>
+<p><strong>Q33. Are all comments analysed?</strong> Only successfully retrieved comments passing the Sinhala Unicode filter. The official API retrieves top-level comments; unavailable/private/deleted content is not accessible. No cap is sent by the current UI, but completeness is not guaranteed.</p>
+<p><strong>Q34. Why exclude romanized comments when the text tab accepts them?</strong> That is the chosen comments scope in this implementation, enforced by the Unicode-character filter. It is a product scope difference, not a limitation of the manual endpoint&#x27;s input type.</p>
+<p><strong>Q35. What happens without an API key?</strong> Comment retrieval uses yt-dlp fallback. A key enables the official Data API attempt; it is read from the environment, not embedded in code.</p>
+<p><strong>Q36. Are comments processed in parallel with audio?</strong> No. The frontend displays completed audio results, then makes the optional comments request. Batch inference processes several texts per model call but is not asynchronous fetching.</p>
+<p><strong>Q37. Where is the PDF button?</strong> The PDF builder is defined but not called by the current UI. The active download is HTML. A defined function is not evidence of an exposed feature.</p>
+<p><strong>Q38. Why can the report disagree with the detailed panel?</strong> Its older timeline derives labels from Booleans and loses uncertainty/no-speech states. Explicit labels and review fields should be included in the export.</p>
+<h3 id="testing-evaluation-and-research">Testing, evaluation and research</h3>
+<p><strong>Q39. What do the ten tests establish?</strong> Specific CTC decoding, context separation, review gating and API failure-handling behavior using synthetic data and mocks. They do not measure model accuracy on real Sinhala speech.</p>
+<p><strong>Q40. How will you prove overlap improved accuracy?</strong> Compare baseline and overlap on the same manually transcribed held-out clips, reporting WER/CER, downstream classification results and latency. A successful demo alone is insufficient.</p>
+<p><strong>Q41. Why macro-F1 instead of accuracy alone?</strong> It gives equal weight to per-class F1 and makes minority-class failures less easy to hide. Report the confusion matrix and class supports as well.</p>
+<p><strong>Q42. How do you prevent leakage?</strong> Split by relevant sources/speakers/recordings before augmentation and duplicate handling, and keep final evaluation separate from tuning. The shown stratified split alone does not establish those guarantees.</p>
+<p><strong>Q43. Did you train the deployed WavLM with the shown older audio script?</strong> The inspected older script uses Wav2Vec2. I must use the actual WavLM training records to substantiate that checkpoint&#x27;s data, training and metrics. Do not fill missing evidence with guesses.</p>
+<p><strong>Q44. What would you improve next?</strong> Validate/calibrate transcript screening, improve speech-presence handling, align report labels with the API, document checkpoint provenance, pin dependencies, and add robust input validation and a job queue for longer analyses. Separate proposed work from completed work.</p>
+<h2 id="20-a-live-demonstration-and-debugging-rehearsal">20. A live demonstration and debugging rehearsal</h2>
+<h3 id="starting-the-application">Starting the application</h3>
+<p>From the project root, use two terminals. Backend:</p>
+<pre><code class="language-powershell">cd backend
+..\.venv\Scripts\python.exe -X utf8 app.py</code></pre>
+<p>Frontend, from the project root in the other terminal:</p>
+<pre><code class="language-powershell">cd frontend
+.\venv\Scripts\python.exe -m streamlit run app.py</code></pre>
+<p>Open http://localhost:8501. UTF-8 mode helps terminal output contain Sinhala without the earlier Windows code-page encoding error. It does not change the recognizer&#x27;s linguistic accuracy.</p>
+<h3 id="minimal-health-and-regression-checks">Minimal health and regression checks</h3>
+<pre><code class="language-powershell">Invoke-RestMethod http://127.0.0.1:5000/api/health
+Invoke-RestMethod http://127.0.0.1:8501/_stcore/health</code></pre>
+<p>From project root:</p>
+<pre><code class="language-powershell">.\.venv\Scripts\python.exe -X utf8 -m unittest discover -s backend -p test_asr.py</code></pre>
+<p>Do not stop an existing server simply because you open another terminal. If restarting, first identify and stop your existing instance so two processes do not compete for the same port. Network access is necessary for YouTube; cached model weights alone do not make YouTube extraction offline.</p>
+<h3 id="a-five-minute-demonstration">A five-minute demonstration</h3>
+<ol>
+<li>Show the three tabs and the architecture in one sentence.</li>
+<li>Submit a prepared Unicode sentence and a romanized sentence. Point to processed_text and clarify that the dictionary is not the classifier.</li>
+<li>Upload a short known clip and explain the separate OFF/NOT and REAL/FAKE questions. State the first-ten-seconds limitation.</li>
+<li>Analyse a short accessible YouTube clip. Show preview, time segments, separate audio/transcript labels, recognition score and fusion reason.</li>
+<li>If comments are enabled, explain the Unicode filter and retrieval source. Open the HTML export and acknowledge its current uncertainty limitation if relevant.</li>
+<li>Show test output and clearly distinguish functional verification from evaluation metrics. Keep a previously saved result for discussion if network availability changes, and label it as a saved result.</li>
+</ol>
+<h3 id="diagnose-by-layer">Diagnose by layer</h3>
+<table><thead><tr><th>Symptom</th><th>First layer to inspect</th><th>Useful explanation</th></tr></thead><tbody>
+<tr><td>Frontend cannot connect</td><td>Backend process and port 5000</td><td>ConnectionError occurs before model inference</td></tr>
+<tr><td>Address already in use</td><td>Existing process on the port</td><td>Do not keep launching duplicate servers</td></tr>
+<tr><td>YouTube WinError 10013</td><td>Process network restrictions</td><td>Socket permission failure, not necessarily invalid URL</td></tr>
+<tr><td>DNS resolution error</td><td>Internet/DNS</td><td>The hostname could not be resolved</td></tr>
+<tr><td>Metadata succeeds, download fails</td><td>yt-dlp extraction/FFmpeg/network</td><td>Separate metadata and media operations</td></tr>
+<tr><td>Model folder error</td><td>Path, config, processor and weights</td><td>All compatible checkpoint files are needed</td></tr>
+<tr><td>First request is slow</td><td>Lazy loading, disk, RAM, CPU</td><td>Subsequent requests can reuse model objects</td></tr>
+<tr><td>Transcript missing</td><td>Audio NO_SPEECH gate, ASR status/reason</td><td>Do not assume the ASR model was called</td></tr>
+<tr><td>Transcript seems wrong but score high</td><td>ASR calibration/domain mismatch</td><td>Confidence does not certify correctness</td></tr>
+<tr><td>Fused label conflicts with explanation</td><td>Audio fields versus fused fields</td><td>Explain dictionary overwrite and retained audio confidence</td></tr>
+<tr><td>Report shows NOT for uncertain segment</td><td>Boolean-based export rendering</td><td>Known presentation limitation</td></tr>
+<tr><td>Result vanishes after interaction</td><td>Streamlit rerun/state</td><td>Results are not persisted in session_state</td></tr>
+</tbody></table>
+<h2 id="21-revision-checklist-and-glossary">21. Revision checklist and glossary</h2>
+<p>Before the viva, be able to locate every endpoint, trace one text request and one YouTube segment, name the deployed checkpoint architectures, explain why uploaded and YouTube audio differ, distinguish all labels and scores, and reproduce the CTC example without reading it. Bring the actual final training results and model provenance rather than relying on UI labels.</p>
+<table><thead><tr><th>Term</th><th>Meaning here</th></tr></thead><tbody>
+<tr><td>API / endpoint</td><td>A network-accessible operation such as POST /api/text/predict</td></tr>
+<tr><td>Backend / frontend</td><td>Inference/orchestration service versus user-interface service</td></tr>
+<tr><td>JSON</td><td>Text serialization format for dictionaries, lists and scalar values</td></tr>
+<tr><td>Multipart</td><td>HTTP body format used to transmit an uploaded file</td></tr>
+<tr><td>Checkpoint</td><td>Saved model weights and configuration from a training state</td></tr>
+<tr><td>Tokenizer</td><td>Converts text into model vocabulary IDs and back where supported</td></tr>
+<tr><td>Feature extractor / processor</td><td>Prepares audio arrays and/or packages tokenizer functionality</td></tr>
+<tr><td>Logit</td><td>Unnormalized model score before softmax</td></tr>
+<tr><td>Softmax</td><td>Normalization across mutually exclusive output choices</td></tr>
+<tr><td>Argmax</td><td>Index of the largest value</td></tr>
+<tr><td>Embedding</td><td>Learned numeric representation of a token or signal feature</td></tr>
+<tr><td>Attention</td><td>Model mechanism relating sequence positions; not used as an explanation here</td></tr>
+<tr><td>Fine-tuning</td><td>Updating pretrained weights/head on task data; not done by a prediction request</td></tr>
+<tr><td>Frozen parameters</td><td>Parameters not updated by gradient optimization during training</td></tr>
+<tr><td>Dropout</td><td>Training-time regularization disabled in evaluation mode</td></tr>
+<tr><td>Padding / truncation</td><td>Filling to a target length / discarding excess input</td></tr>
+<tr><td>Sampling rate</td><td>Number of audio samples per second</td></tr>
+<tr><td>Mono</td><td>One channel of audio</td></tr>
+<tr><td>Waveform</td><td>Audio amplitude samples over time</td></tr>
+<tr><td>VAD</td><td>Speech-activity interval detection</td></tr>
+<tr><td>RMS</td><td>Root-mean-square amplitude measure</td></tr>
+<tr><td>ZCR</td><td>Approximate sign-change rate in the waveform</td></tr>
+<tr><td>ASR</td><td>Automatic speech recognition: audio to text</td></tr>
+<tr><td>CTC blank</td><td>Alignment symbol for emitting no token at a frame</td></tr>
+<tr><td>Greedy decoding</td><td>Taking the highest-scoring token at each frame</td></tr>
+<tr><td>Receptive field</td><td>Input region associated with a local feature; distinguish conv grid from attention context</td></tr>
+<tr><td>Stride</td><td>Input displacement between successive convolution outputs</td></tr>
+<tr><td>Fusion</td><td>Combining multiple model decisions using the stated rules</td></tr>
+<tr><td>Abstention / review</td><td>Declining a definitive decision when evidence is insufficient</td></tr>
+<tr><td>Calibration</td><td>Agreement between stated confidence and empirical correctness</td></tr>
+<tr><td>Domain shift</td><td>Test inputs differ from training conditions</td></tr>
+<tr><td>Regression test</td><td>Test that established software behavior remains correct after a change</td></tr>
+<tr><td>Mock</td><td>Controlled replacement of a dependency for a test</td></tr>
+<tr><td>Smoke test</td><td>Small execution check that the workflow runs</td></tr>
+<tr><td>Ablation</td><td>Controlled comparison with a component removed or changed</td></tr>
+<tr><td>Data leakage</td><td>Evaluation information entering training or tuning improperly</td></tr>
+<tr><td>Provenance</td><td>Records linking data, code, training run and exported checkpoint</td></tr>
+</tbody></table>
+<h2 id="22-references-and-evidence-boundaries">22. References and evidence boundaries</h2>
+<p>The primary evidence for file/function behavior is the numbered source snapshot in SOURCE_ATLAS.html and the model configurations recorded there. Line numbers refer to this review&#x27;s snapshot. Third-party concepts were checked against official references; project-specific limitations above come from the local code, not claims about the libraries in general.</p>
+<ul>
+<li><a href="https://huggingface.co/docs/transformers/model_doc/wav2vec2">Hugging Face Wav2Vec2 reference</a>: waveform models and task heads.</li>
+<li><a href="https://huggingface.co/docs/transformers/model_doc/wavlm">Hugging Face WavLM reference</a>: configured speech-model family.</li>
+<li><a href="https://huggingface.co/docs/transformers/model_doc/xlm-roberta">Hugging Face XLM-RoBERTa reference</a>: multilingual text architecture.</li>
+<li><a href="https://docs.pytorch.org/docs/stable/generated/torch.autograd.grad_mode.inference_mode.html">PyTorch inference_mode reference</a>: gradient mode versus eval mode.</li>
+<li><a href="https://docs.streamlit.io/get-started/fundamentals/main-concepts">Streamlit execution fundamentals</a>: reruns and Python UI execution.</li>
+<li><a href="https://huggingface.co/blog/asr-chunking">CTC audio chunking explanation</a>: background on using overlapping context; this app uses its own token-run selection rather than that pipeline verbatim.</li>
+</ul>
+<p>No new dataset accuracy, WER improvement, latency benchmark or human-reviewed transcript correctness has been established by preparing this document. The study guide helps you explain what exists, identify what requires evidence, and answer limitations precisely.</p><p class="subtitle">Prepared from the local source snapshot on 14 October 2026. Read explicit labels and limitations alongside model scores.</p></main></body></html>
